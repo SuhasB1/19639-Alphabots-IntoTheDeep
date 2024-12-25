@@ -9,12 +9,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-import java.io.Console;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
-import alphabots.pedroPathing.follower.Follower;
 import alphabots.pedroPathing.localization.Pose;
 import alphabots.pedroPathing.pathGeneration.MathFunctions;
 

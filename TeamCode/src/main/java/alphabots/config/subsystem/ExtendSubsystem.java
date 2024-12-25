@@ -3,43 +3,59 @@ package alphabots.config.subsystem;
 import static alphabots.config.util.RobotConstants.*;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.arcrobotics.ftclib.controller.PIDController;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class ExtendSubsystem {
     private Telemetry telemetry;
-
-    public Servo left, right;
-    private double pos = 0;
-    public double extendLimit = extendFullSample;
-
+    public boolean manual = false;
+    public DcMotorEx extend;
+    private int currentPos = 0;
+    public int extendLimit = extendFullSample;
+    public PIDController extendPID;
+    public static int target;
+    public static double p = 0, i = 0, d = 0;
     public ExtendSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
         this.telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        left = hardwareMap.get(Servo.class, "leftExtend");
-        right = hardwareMap.get(Servo.class, "rightExtend");
+        extend = hardwareMap.get(DcMotorEx.class, "extend");
+        extend.setDirection(DcMotor.Direction.FORWARD);
+        extend.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        extend.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        extendPID = new PIDController(p, i, d);
+
     }
 
-    public void manual(int direction) {
-        double rightPos = right.getPosition();
+    public void updatePIDF(){
+        if (!manual) {
+            extendPID.setPID(p,i,d);
 
-        if (rightPos <= extendLimit || direction < 0) {
-            rightPos += (extendManualIncrements * direction);
-        } else {
-            rightPos = right.getPosition();
+            extend.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
+            double pid = extendPID.calculate(getPos(), target);
+            double power = pid;
+
+            extend.setPower(power);
         }
-
-        left.setPosition(rightPos);
-        right.setPosition(rightPos);
     }
 
-    public void setTarget(double b) {
-        left.setPosition(b);
-        right.setPosition(b);
-        pos = b;
+    public void targetCurrent() {
+        setTarget(getPos());
+        manual = false;
+    }
+
+    public void manual(double n){
+        manual = true;
+
+        extend.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        extend.setPower(n);
     }
 
     public void toZero() {
@@ -59,9 +75,9 @@ public class ExtendSubsystem {
     }
 
     // Util
-    public double getPos() {
-        pos = right.getPosition();
-        return pos;
+    public int getPos() {
+        currentPos = extend.getCurrentPosition();
+        return currentPos;
     }
 
     public void setLimitToSpecimen() {
@@ -73,12 +89,25 @@ public class ExtendSubsystem {
     }
 
     // Init + Start //
+    public double getTarget() {
+        return target;
+    }
+
+    public void setTarget(int b) {
+        target = b;
+    }
+
+    public void addToTarget(int b) {
+        target += b;
+    }
+
+    // OpMode
     public void init() {
-        toZero();
+        extendPID.setPID(p,i,d);
     }
 
     public void start() {
-        toZero();
+        target = 0;
     }
 
     public void telemetry() {

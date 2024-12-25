@@ -1,79 +1,48 @@
 package alphabots.config.subsystem;
 
 import static alphabots.config.util.RobotConstants.*;
+
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-
-/** @author Baron Henderson
- * @version 1.0 | 12/3/24
- */
-
-public class IntakeSubsystem {
-
-    public enum GrabState {
-        CLOSED, OPEN
-    }
-
-    public enum RotateState {
-        TRANSFER, GROUND, HOVER
+public class IntakeSubsystem { //STILL NEED TO CODE WIPER
+    public enum IntakeState {
+        INTAKE, IDLE, OUTTAKE
     }
 
     public enum PivotState {
         TRANSFER, GROUND, HOVER
     }
 
-    public Servo grab, leftRotate, rightRotate, leftPivot, rightPivot;
-    public GrabState grabState;
-    public RotateState rotateState;
+    public Servo leftPivot, rightPivot, wiper;
+    public CRServo intake;
+    public IntakeState intakeState;
     public PivotState pivotState;
     private Telemetry telemetry;
 
-    public IntakeSubsystem(HardwareMap hardwareMap, Telemetry telemetry, GrabState grabState, RotateState rotateState, PivotState pivotState) {
-        grab = hardwareMap.get(Servo.class, "iG");
-        leftRotate = hardwareMap.get(Servo.class, "iLR");
-        rightRotate = hardwareMap.get(Servo.class, "iRR");
+    public IntakeSubsystem(HardwareMap hardwareMap, Telemetry telemetry, IntakeState intakeState, PivotState pivotState) {
+        intake = hardwareMap.get(CRServo.class, "iG");
         leftPivot = hardwareMap.get(Servo.class, "iLP");
         rightPivot = hardwareMap.get(Servo.class, "iRP");
+        wiper = hardwareMap.get(Servo.class, "iW");
         this.telemetry = telemetry;
-        this.grabState = grabState;
-        this.rotateState = rotateState;
+        this.intakeState = intakeState;
         this.pivotState = pivotState;
     }
 
-    public void setRotateState(RotateState state) {
-        if (state == RotateState.TRANSFER) {
-            leftRotate.setPosition(intakeRotateTransfer);
-            rightRotate.setPosition(intakeRotateTransfer);
-            this.rotateState = RotateState.TRANSFER;
-        } else if (state == RotateState.GROUND) {
-            leftRotate.setPosition(intakeRotateGround);
-            rightRotate.setPosition(intakeRotateGround);
-            this.rotateState = RotateState.GROUND;
-        } else if (state == RotateState.HOVER) {
-            leftRotate.setPosition(intakeRotateHover);
-            rightRotate.setPosition(intakeRotateHover);
-            this.rotateState = RotateState.HOVER;
-        }
-    }
-
-    public void setGrabState(GrabState grabState) {
-        if (grabState == GrabState.CLOSED) {
-            grab.setPosition(intakeGrabClose);
-            this.grabState = GrabState.CLOSED;
-        } else if (grabState == GrabState.OPEN) {
-            grab.setPosition(intakeGrabOpen);
-            this.grabState = GrabState.OPEN;
-        }
-    }
-
-    public void switchGrabState() {
-        if (grabState == GrabState.CLOSED) {
-            setGrabState(GrabState.OPEN);
-        } else if (grabState == GrabState.OPEN) {
-            setGrabState(GrabState.CLOSED);
+    public void setIntakeState(IntakeState intakeState) {
+        if (intakeState == IntakeState.IDLE) {
+            intake.setPower(intakeBoxIdle);
+            this.intakeState = IntakeState.IDLE;
+        } else if (intakeState == IntakeState.INTAKE) {
+            intake.setPower(intakeBoxIntake);
+            this.intakeState = IntakeState.INTAKE;
+        } else if (intakeState == IntakeState.OUTTAKE) {
+            intake.setPower(intakeBoxOuttake);
+            this.intakeState = IntakeState.OUTTAKE;
         }
     }
 
@@ -93,46 +62,56 @@ public class IntakeSubsystem {
         }
     }
 
-    public void open() {
-        setGrabState(GrabState.OPEN);
+    public void switchIntakeState() {
+        if (intakeState == IntakeState.INTAKE) {
+            setIntakeState(IntakeState.IDLE);
+        } else if (intakeState == IntakeState.IDLE || intakeState == IntakeState.OUTTAKE) {
+            setIntakeState(IntakeState.INTAKE);
+        }
     }
 
-    public void close() {
-        setGrabState(GrabState.CLOSED);
+    public void switchOuttakeState() {
+        if (intakeState == IntakeState.OUTTAKE) {
+            setIntakeState(IntakeState.IDLE);
+        } else if (intakeState == IntakeState.INTAKE || intakeState == IntakeState.IDLE) {
+            setIntakeState(IntakeState.OUTTAKE);
+        }
+    }
+
+    public void intake() {
+        setIntakeState(IntakeState.INTAKE);
+    }
+
+    public void idle() {
+        setIntakeState(IntakeState.IDLE);
     }
 
     public void transfer() {
-        setRotateState(RotateState.TRANSFER);
         setPivotState(PivotState.TRANSFER);
-        setGrabState(GrabState.CLOSED);
+        setIntakeState(IntakeState.IDLE);
     }
 
     public void ground() {
-        setRotateState(RotateState.GROUND);
         setPivotState(PivotState.GROUND);
     }
 
     public void hover() {
         setPivotState(PivotState.HOVER);
-        setRotateState(RotateState.HOVER);
-        setGrabState(GrabState.OPEN);
+        setIntakeState(IntakeState.INTAKE);
     }
 
     public void init() {
         setPivotState(PivotState.TRANSFER);
-        setRotateState(RotateState.TRANSFER);
-        setGrabState(GrabState.CLOSED);
+        setIntakeState(IntakeState.IDLE);
     }
 
     public void start() {
-        setPivotState(PivotState.HOVER);
-        setRotateState(RotateState.HOVER);
-        setGrabState(GrabState.OPEN);
+        setPivotState(PivotState.TRANSFER);
+        setIntakeState(IntakeState.IDLE);
     }
 
     public void telemetry() {
-        telemetry.addData("Intake Grab State: ", grabState);
-        telemetry.addData("Intake Rotate State: ", rotateState);
+        telemetry.addData("Intake Box State: ", intakeState);
         telemetry.addData("Intake Pivot State: ", pivotState);
     }
 }

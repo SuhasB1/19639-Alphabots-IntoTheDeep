@@ -1,7 +1,5 @@
 package alphabots.config.vision;
 
-import android.graphics.Color;
-
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;

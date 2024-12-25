@@ -6,11 +6,9 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-import alphabots.config.util.RobotConstants;
 import alphabots.config.util.action.RunAction;
 
 public class LiftSubsystem {
@@ -122,10 +120,6 @@ public class LiftSubsystem {
 
     public void toHumanPlayer() {
         setTarget(liftToHumanPlayer);
-    }
-
-    public void toTransfer() {
-        setTarget(liftToTransfer);
     }
 
     public void toPark() {

@@ -1,6 +1,5 @@
 package alphabots.config.runmodes;
 
-//import org.firstinspires.ftc.teamcode.config.subsystem.ServoSubsystem;
 import alphabots.config.subsystem.VisionSubsystem;
 import alphabots.pedroPathing.follower.Follower;
 import alphabots.pedroPathing.localization.Pose;
@@ -14,7 +13,6 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class UnusedTeleopWithExamples {
 
-    //private ServoSubsystem servoSubsystem;
     private VisionSubsystem visionSubsystem;
 
     private Follower follower;
@@ -62,8 +60,6 @@ public class UnusedTeleopWithExamples {
 
 
     public UnusedTeleopWithExamples(HardwareMap hardwareMap, Telemetry telemetry, Follower follower, Pose startPose,  boolean fieldCentric, Gamepad gamepad1, Gamepad gamepad2) {
-        //servoSubsystem = new ServoSubsystem(hardwareMap);
-    //    visionSubsystem = new VisionSubsystem(hardwareMap, telemetry);
 
         this.follower = follower;
         this.startPose = startPose;

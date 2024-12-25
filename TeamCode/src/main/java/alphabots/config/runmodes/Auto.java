@@ -22,15 +22,15 @@ public class Auto {
     private RobotStart startLocation;
 
     public IntakeSubsystem intake;
-    private IntakeSubsystem.GrabState intakeGrabState;
+    private IntakeSubsystem.IntakeState intakeBoxState;
     private IntakeSubsystem.PivotState intakePivotState;
-    private IntakeSubsystem.RotateState intakeRotateState;
-
     public OuttakeSubsystem outtake;
     private OuttakeSubsystem.GrabState outtakeGrabState;
     private OuttakeSubsystem.PivotState outtakePivotState;
     private OuttakeSubsystem.RotateState outtakeRotateState;
-    
+    private OuttakeSubsystem.RotateState outtakeSpinState;
+
+
     public LiftSubsystem lift;
     public ExtendSubsystem extend;
 
@@ -67,6 +67,7 @@ public class Auto {
         outtake.init();
         lift.init();
         extend.toZero();
+        lift.toZero();
         intake.init();
         telemetryUpdate();
 
@@ -253,7 +254,7 @@ public class Auto {
             case 1:
                 actionBusy = true;
                 intake.transfer();
-                lift.toTransfer();
+                lift.toZero();
                 outtake.transfer();
                 extend.toZero();
                 lift.toZero();
@@ -400,7 +401,7 @@ public class Auto {
                 if(intakeTimer.getElapsedTimeSeconds() > 0.5) {
                     outtake.transfer();
                     intake.hover();
-                    lift.toTransfer();
+                    lift.toZero();
                     outtake.open();
                     extend.toHalf();
                     intakeTimer.resetTimer();
@@ -416,7 +417,7 @@ public class Auto {
                 break;
             case 4:
                 if (intakeTimer.getElapsedTimeSeconds() > 1.5) {
-                    intake.close();
+                    intake.idle();
                     intakeTimer.resetTimer();
                     actionBusy = false;
                     setTransferState(-1);

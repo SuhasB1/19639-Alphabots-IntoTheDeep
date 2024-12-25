@@ -1,9 +1,9 @@
 package alphabots.pedroPathing.examples;
 
-import alphabots.pedroPathing.tuning.FollowerConstants.leftFrontMotorName;
-import alphabots.pedroPathing.tuning.FollowerConstants.leftRearMotorName;
-import alphabots.pedroPathing.tuning.FollowerConstants.rightFrontMotorName;
-import alphabots.pedroPathing.tuning.FollowerConstants.rightRearMotorName;
+import static alphabots.pedroPathing.tuning.FollowerConstants.leftFrontMotorName;
+import static alphabots.pedroPathing.tuning.FollowerConstants.leftRearMotorName;
+import static alphabots.pedroPathing.tuning.FollowerConstants.rightFrontMotorName;
+import static alphabots.pedroPathing.tuning.FollowerConstants.rightRearMotorName;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;

@@ -1,13 +1,13 @@
 package alphabots.pedroPathing.tuning;
 
-import alphabots.pedroPathing.tuning.FollowerConstants.leftFrontMotorName;
-import alphabots.pedroPathing.tuning.FollowerConstants.leftRearMotorName;
-import alphabots.pedroPathing.tuning.FollowerConstants.rightFrontMotorName;
-import alphabots.pedroPathing.tuning.FollowerConstants.rightRearMotorName;
-import alphabots.pedroPathing.tuning.FollowerConstants.leftFrontMotorDirection;
-import alphabots.pedroPathing.tuning.FollowerConstants.leftRearMotorDirection;
-import alphabots.pedroPathing.tuning.FollowerConstants.rightFrontMotorDirection;
-import alphabots.pedroPathing.tuning.FollowerConstants.rightRearMotorDirection;
+import static alphabots.pedroPathing.tuning.FollowerConstants.leftFrontMotorName;
+import static alphabots.pedroPathing.tuning.FollowerConstants.leftRearMotorName;
+import static alphabots.pedroPathing.tuning.FollowerConstants.rightFrontMotorName;
+import static alphabots.pedroPathing.tuning.FollowerConstants.rightRearMotorName;
+import static alphabots.pedroPathing.tuning.FollowerConstants.leftFrontMotorDirection;
+import static alphabots.pedroPathing.tuning.FollowerConstants.leftRearMotorDirection;
+import static alphabots.pedroPathing.tuning.FollowerConstants.rightFrontMotorDirection;
+import static alphabots.pedroPathing.tuning.FollowerConstants.rightRearMotorDirection;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;

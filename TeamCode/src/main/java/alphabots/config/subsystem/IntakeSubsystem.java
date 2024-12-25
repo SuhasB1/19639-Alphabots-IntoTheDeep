@@ -8,6 +8,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
+import alphabots.pedroPathing.util.Timer;
+
 public class IntakeSubsystem { //STILL NEED TO CODE WIPER
     public enum IntakeState {
         INTAKE, IDLE, OUTTAKE
@@ -21,6 +23,7 @@ public class IntakeSubsystem { //STILL NEED TO CODE WIPER
     public CRServo intake;
     public IntakeState intakeState;
     public PivotState pivotState;
+    public Timer wiperTimer = new Timer();
     private Telemetry telemetry;
 
     public IntakeSubsystem(HardwareMap hardwareMap, Telemetry telemetry, IntakeState intakeState, PivotState pivotState) {
@@ -82,6 +85,14 @@ public class IntakeSubsystem { //STILL NEED TO CODE WIPER
         setIntakeState(IntakeState.INTAKE);
     }
 
+    public void swipe() {
+        wiperTimer.resetTimer();
+        wiper.setPosition(intakeWiperOpen);
+        if (wiperTimer.getElapsedTimeSeconds() > 0.25) {
+            wiper.setPosition(intakeWiperClose);
+        }
+    }
+
     public void idle() {
         setIntakeState(IntakeState.IDLE);
     }
@@ -103,11 +114,14 @@ public class IntakeSubsystem { //STILL NEED TO CODE WIPER
     public void init() {
         setPivotState(PivotState.TRANSFER);
         setIntakeState(IntakeState.IDLE);
+        wiper.setPosition(intakeWiperClose);
     }
 
     public void start() {
         setPivotState(PivotState.TRANSFER);
         setIntakeState(IntakeState.IDLE);
+        wiper.setPosition(intakeWiperClose);
+
     }
 
     public void telemetry() {

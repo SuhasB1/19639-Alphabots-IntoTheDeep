@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import alphabots.config.subsystem.LimelightSubsystem;
 import alphabots.config.util.FieldConstants;
-import alphabots.config.util.RobotConstants;
 import alphabots.pedroPathing.localization.Pose;
 
 @TeleOp

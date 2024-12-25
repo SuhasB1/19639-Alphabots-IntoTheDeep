@@ -28,6 +28,8 @@ public class RobotConstants {
     public static double intakePivotTransfer= 0;
     public static double intakePivotGround = 0;
     public static double intakePivotHover = 0;
+    public static double intakeWiperOpen = 0;
+    public static double intakeWiperClose = 0;
 
     // Lift Positions
     public static int liftToZero = 0;

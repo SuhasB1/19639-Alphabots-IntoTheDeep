@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import alphabots.config.subsystem.IntakeSubsystem;
-import alphabots.config.subsystem.OuttakeSubsystem;
 import alphabots.pedroPathing.follower.Follower;
 
 @Config
@@ -13,15 +12,14 @@ import alphabots.pedroPathing.follower.Follower;
 public class armTest extends OpMode {
 
     private IntakeSubsystem intake;
-    private IntakeSubsystem.GrabState intakeGrabState;
-    private IntakeSubsystem.RotateState intakeRotateState;
+    private IntakeSubsystem.IntakeState intakeBoxState;
     private IntakeSubsystem.PivotState intakePivotState;
 
     private Follower follower;
 
     @Override
     public void init() {
-        intake = new IntakeSubsystem(hardwareMap, telemetry, intakeGrabState, intakeRotateState, intakePivotState);
+        intake = new IntakeSubsystem(hardwareMap, telemetry, intakeBoxState, intakePivotState);
         follower = new Follower(hardwareMap);
         intake.init();
     }
@@ -42,16 +40,15 @@ public class armTest extends OpMode {
             intake.ground();
         }
         if(gamepad1.right_bumper) {
-            intake.close();
+            intake.idle();
         } else if (gamepad1.left_bumper) {
-            intake.open();
+            intake.intake();
         }
 
         follower.setTeleOpMovementVectors(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, true);
         follower.update();
 
 
-      //  telemetry.addData("armState", arm.state);
         intake.telemetry();
         telemetry.update();
     }

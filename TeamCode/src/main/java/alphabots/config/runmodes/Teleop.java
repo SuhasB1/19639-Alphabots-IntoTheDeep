@@ -96,28 +96,20 @@ public class Teleop {
 
         lift.manual(gamepad2.right_trigger - gamepad2.left_trigger);
 
-        if (gamepad1.x) {
-            flip = -1;
-        }
-
-        if (gamepad1.b) {
-            flip = 1;
-        }
-
         if (gamepad2.right_bumper)
-            extend.manual(1);
+            extend.manual(30);
         else if (gamepad2.left_bumper)
-            extend.manual(-1);
+            extend.manual(-30);
         else
             extend.manual(0);
 
-        if (currentGamepad2.a && !previousGamepad2.a)
+        if (currentGamepad2.cross && !previousGamepad2.cross)
             outtake.switchGrabState();
 
-        if (currentGamepad2.y && !previousGamepad2.y)
+        if (currentGamepad2.triangle && !previousGamepad2.triangle)
             transferPos();
 
-        if (currentGamepad2.x && !previousGamepad2.x)
+        if (currentGamepad2.square && !previousGamepad2.square)
             scoringPos();
 
         if (currentGamepad2.dpad_left && !previousGamepad2.dpad_left)
@@ -126,10 +118,10 @@ public class Teleop {
         if (currentGamepad2.dpad_right && !previousGamepad2.dpad_right)
             specimenScorePos();
 
-        if (currentGamepad1.b && !previousGamepad1.b)
+        if (currentGamepad1.circle && !previousGamepad1.circle)
             intake.switchIntakeState();
 
-        if (currentGamepad1.a && !previousGamepad1.a)
+        if (currentGamepad1.cross && !previousGamepad1.cross)
             intake.switchOuttakeState();
 
         if (gamepad2.left_stick_button) {

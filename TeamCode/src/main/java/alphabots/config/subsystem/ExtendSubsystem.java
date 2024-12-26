@@ -50,12 +50,12 @@ public class ExtendSubsystem {
         manual = false;
     }
 
-    public void manual(double n){
+    public void manual(int n){
         manual = true;
 
         extend.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        extend.setPower(n);
+        addToTarget(n);
     }
 
     public void toZero() {

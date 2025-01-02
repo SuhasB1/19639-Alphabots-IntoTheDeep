@@ -29,7 +29,9 @@
 
 package alphabots.opmode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -46,22 +48,28 @@ public class pidTestLift extends OpMode {
     public static int posLeft, posRight;
     public PIDController liftPID;
     public static int target;
+    public static double manualLeftPower = 0, manualRightPower = 0;
     public static double p = 0.00, i = 0, d = 0;
     public static double f = 0.00;
     private Gamepad currentGamepad2 = new Gamepad(), previousGamepad2 = new Gamepad();
 
     @Override
     public void init() {
+        posLeft = 0;
+        posRight = 0;
         rightLift = hardwareMap.get(DcMotor.class, "bottomLift");
         leftLift = hardwareMap.get(DcMotor.class, "topLift");
 
         rightLift.setDirection(DcMotor.Direction.FORWARD);
-        leftLift.setDirection(DcMotor.Direction.REVERSE);
-        rightLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftLift.setDirection(DcMotor.Direction.FORWARD);
+        leftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightLift.setDirection(DcMotor.Direction.FORWARD);
         rightLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         liftPID = new PIDController(p, i, d);
+        telemetry.setMsTransmissionInterval(50);
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
     }
 
     @Override
@@ -96,6 +104,10 @@ public class pidTestLift extends OpMode {
             telemetry.addData("left lift pos", getLeftPos());
             telemetry.addData("right lift pos", getRightPos());
             telemetry.addData("lift target", target);
+        }
+        else {
+            leftLift.setPower(manualLeftPower);
+            rightLift.setPower(manualRightPower);
         }
     }
 

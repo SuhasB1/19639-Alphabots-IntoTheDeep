@@ -18,13 +18,13 @@ public class ExtendSubsystem {
     public int extendLimit = extendFullSample;
     public PIDController extendPID;
     public static int target;
-    public static double p = 0, i = 0, d = 0;
+    public static double p = 0.03, i = 0, d = 0;
     public ExtendSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
         this.telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         extend = hardwareMap.get(DcMotorEx.class, "extend");
-        extend.setDirection(DcMotor.Direction.FORWARD);
+        extend.setDirection(DcMotor.Direction.REVERSE);
         extend.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         extend.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 

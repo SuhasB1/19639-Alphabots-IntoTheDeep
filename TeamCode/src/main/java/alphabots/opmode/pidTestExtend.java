@@ -29,12 +29,15 @@
 
 package alphabots.opmode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 
 import alphabots.config.util.action.RunAction;
 
@@ -42,30 +45,30 @@ import alphabots.config.util.action.RunAction;
 @TeleOp(name="PID_Test_Extend", group="z")
 public class pidTestExtend extends OpMode {
     public DcMotor extend;
-    public static boolean manual = false;
     public static int pos;
     public PIDController liftPID;
     public static int target;
-    public static double p = 0.01, i = 0, d = 0;
+    public static double p = 0.03, i = 0, d = 0;
     private Gamepad currentGamepad2 = new Gamepad(), previousGamepad2 = new Gamepad();
 
     @Override
     public void init() {
         extend = hardwareMap.get(DcMotor.class, "extend");
 
-        extend.setDirection(DcMotor.Direction.FORWARD);
+        extend.setDirection(DcMotor.Direction.REVERSE);
         extend.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         extend.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         liftPID = new PIDController(p, i, d);
+
+        telemetry.setMsTransmissionInterval(50);
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
     }
 
     @Override
     public void loop() {
 
         updatePIDF();
-
-        telemetry.addData("manual", manual);
         telemetry.addData("pos", getPos());
         telemetry.addData("target", target);
         telemetry.addData("P:", p);
@@ -75,17 +78,15 @@ public class pidTestExtend extends OpMode {
     }
 
     public void updatePIDF(){
-        if (!manual) {
-            liftPID.setPID(p,i,d);
-            extend.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-            double pid = liftPID.calculate(getPos(), target);
-            double power = pid;
+        liftPID.setPID(p,i,d);
+        extend.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        double pid = liftPID.calculate(getPos(), target);
+        double power = pid;
 
-            extend.setPower(power);
+        extend.setPower(power);
 
-            telemetry.addData("extend pos", getPos());
-            telemetry.addData("extend target", target);
-        }
+        telemetry.addData("extend pos", getPos());
+        telemetry.addData("extend target", target);
     }
 
     //Util

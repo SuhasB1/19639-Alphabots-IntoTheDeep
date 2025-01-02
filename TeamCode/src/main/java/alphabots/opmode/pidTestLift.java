@@ -43,17 +43,17 @@ import alphabots.config.util.action.RunAction;
 public class pidTestLift extends OpMode {
     public DcMotor rightLift, leftLift;
     public static boolean manual = false;
-    public static int pos;
+    public static int posLeft, posRight;
     public PIDController liftPID;
     public static int target;
-    public static double p = 0.01, i = 0, d = 0;
-    public static double f = 0.05;
+    public static double p = 0.00, i = 0, d = 0;
+    public static double f = 0.00;
     private Gamepad currentGamepad2 = new Gamepad(), previousGamepad2 = new Gamepad();
 
     @Override
     public void init() {
-        rightLift = hardwareMap.get(DcMotor.class, "rightLift");
-        leftLift = hardwareMap.get(DcMotor.class, "leftLift");
+        rightLift = hardwareMap.get(DcMotor.class, "bottomLift");
+        leftLift = hardwareMap.get(DcMotor.class, "topLift");
 
         rightLift.setDirection(DcMotor.Direction.FORWARD);
         leftLift.setDirection(DcMotor.Direction.REVERSE);
@@ -70,7 +70,8 @@ public class pidTestLift extends OpMode {
         updatePIDF();
 
         telemetry.addData("manual", manual);
-        telemetry.addData("pos", getPos());
+        telemetry.addData("left lift pos", getLeftPos());
+        telemetry.addData("right lift pos", getRightPos());
         telemetry.addData("target", target);
         telemetry.addData("P:", p);
         telemetry.addData("I:", i);
@@ -84,7 +85,7 @@ public class pidTestLift extends OpMode {
             liftPID.setPID(p,i,d);
             rightLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
             leftLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-            double pid = liftPID.calculate(getPos(), target);
+            double pid = liftPID.calculate(getLeftPos(), target);
             double ticks_in_degrees = 537.7 / 360.0;
             double ff = Math.cos(Math.toRadians(target / ticks_in_degrees)) * f;
             double power = pid + ff;
@@ -92,7 +93,8 @@ public class pidTestLift extends OpMode {
             rightLift.setPower(power);
             leftLift.setPower(power);
 
-            telemetry.addData("lift pos", getPos());
+            telemetry.addData("left lift pos", getLeftPos());
+            telemetry.addData("right lift pos", getRightPos());
             telemetry.addData("lift target", target);
         }
     }
@@ -107,8 +109,12 @@ public class pidTestLift extends OpMode {
         target += b;
     }
 
-    public int getPos() {
-        pos = rightLift.getCurrentPosition();
+    public int getRightPos() {
+        posRight = rightLift.getCurrentPosition();
         return rightLift.getCurrentPosition();
+    }
+    public int getLeftPos() {
+        posLeft = leftLift.getCurrentPosition();
+        return leftLift.getCurrentPosition();
     }
 }

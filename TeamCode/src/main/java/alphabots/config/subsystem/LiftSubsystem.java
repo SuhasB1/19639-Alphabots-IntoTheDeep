@@ -29,8 +29,8 @@ public class LiftSubsystem {
         this.telemetry = telemetry;
         this.telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        rightLift = hardwareMap.get(DcMotor.class, "rightLift");
-        leftLift = hardwareMap.get(DcMotor.class, "leftLift");
+        rightLift = hardwareMap.get(DcMotor.class, "bottomLift");
+        leftLift = hardwareMap.get(DcMotor.class, "topLift");
 
         rightLift.setDirection(DcMotor.Direction.FORWARD);
         leftLift.setDirection(DcMotor.Direction.REVERSE);

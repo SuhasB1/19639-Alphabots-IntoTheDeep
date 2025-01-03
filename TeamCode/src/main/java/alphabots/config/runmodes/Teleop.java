@@ -5,17 +5,17 @@ import alphabots.config.subsystem.ExtendSubsystem;
 import alphabots.config.subsystem.IntakeSubsystem;
 import alphabots.config.subsystem.LiftSubsystem;
 import alphabots.config.util.RobotConstants;
-import alphabots.pedroPathing.follower.Follower;
-import alphabots.pedroPathing.localization.Pose;
+import com.pedropathing.follower.Follower;
+import com.pedropathing.localization.Pose;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-import alphabots.pedroPathing.pathGeneration.BezierCurve;
-import alphabots.pedroPathing.pathGeneration.PathChain;
-import alphabots.pedroPathing.pathGeneration.Point;
-import alphabots.pedroPathing.util.Timer;
+import com.pedropathing.pathgen.BezierCurve;
+import com.pedropathing.pathgen.PathChain;
+import com.pedropathing.pathgen.Point;
+import com.pedropathing.util.Timer;
 
 public class Teleop {
 

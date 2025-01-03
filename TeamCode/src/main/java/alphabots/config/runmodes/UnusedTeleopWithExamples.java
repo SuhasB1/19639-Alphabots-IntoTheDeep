@@ -1,8 +1,8 @@
 package alphabots.config.runmodes;
 
 import alphabots.config.subsystem.VisionSubsystem;
-import alphabots.pedroPathing.follower.Follower;
-import alphabots.pedroPathing.localization.Pose;
+import com.pedropathing.follower.Follower;
+import com.pedropathing.localization.Pose;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;

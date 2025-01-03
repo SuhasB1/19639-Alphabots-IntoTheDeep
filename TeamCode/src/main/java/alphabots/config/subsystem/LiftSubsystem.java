@@ -32,7 +32,7 @@ public class LiftSubsystem {
         rightLift = hardwareMap.get(DcMotor.class, "bottomLift");
         leftLift = hardwareMap.get(DcMotor.class, "topLift");
 
-        rightLift.setDirection(DcMotor.Direction.FORWARD);
+        rightLift.setDirection(DcMotor.Direction.REVERSE);
         leftLift.setDirection(DcMotor.Direction.FORWARD);
         rightLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);

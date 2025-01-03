@@ -4,18 +4,18 @@ import static alphabots.config.util.FieldConstants.*;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import alphabots.pedroPathing.pathGeneration.BezierCurve;
+import com.pedropathing.pathgen.BezierCurve;
 import alphabots.config.subsystem.OuttakeSubsystem;
 import alphabots.config.subsystem.ExtendSubsystem;
 import alphabots.config.subsystem.IntakeSubsystem;
 import alphabots.config.subsystem.LiftSubsystem;
-import alphabots.pedroPathing.follower.Follower;
-import alphabots.pedroPathing.localization.Pose;
-import alphabots.pedroPathing.pathGeneration.BezierLine;
-import alphabots.pedroPathing.pathGeneration.Path;
-import alphabots.pedroPathing.pathGeneration.PathChain;
-import alphabots.pedroPathing.pathGeneration.Point;
-import alphabots.pedroPathing.util.Timer;
+import com.pedropathing.follower.Follower;
+import com.pedropathing.localization.Pose;
+import com.pedropathing.pathgen.BezierLine;
+import com.pedropathing.pathgen.Path;
+import com.pedropathing.pathgen.PathChain;
+import com.pedropathing.pathgen.Point;
+import com.pedropathing.util.Timer;
 
 public class Auto {
 

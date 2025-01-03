@@ -11,8 +11,8 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import java.util.List;
 
-import alphabots.pedroPathing.localization.Pose;
-import alphabots.pedroPathing.pathGeneration.MathFunctions;
+import com.pedropathing.localization.Pose;
+import com.pedropathing.pathgen.MathFunctions;
 
 public class LimelightSubsystem {
 
@@ -151,7 +151,7 @@ public class LimelightSubsystem {
         return new Pose(cameraFieldX, cameraFieldY, cameraFieldHeading);
     }
 
-    /**
+    /*
      * Sorts the detected samples by their distance to the targetPose.
      * The closer the sample is to the targetPose, the higher it is in the list.
      */

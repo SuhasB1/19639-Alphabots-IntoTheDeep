@@ -1,4 +1,4 @@
-package alphabots.pedroPathing.examples;
+package alphabots.pedropathing.examples;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
@@ -12,8 +12,8 @@ import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import  com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-import alphabots.pedroPathing.constants.FConstants;
-import alphabots.pedroPathing.constants.LConstants;
+import alphabots.pedropathing.constants.FConstants;
+import alphabots.pedropathing.constants.LConstants;
 
 /**
  * This is an example auto that showcases movement and control of two servos autonomously.

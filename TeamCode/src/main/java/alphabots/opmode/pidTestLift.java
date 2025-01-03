@@ -38,8 +38,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-import alphabots.config.util.action.RunAction;
-
 @Config
 @TeleOp(name="PID_Test_Lift", group="z")
 public class pidTestLift extends OpMode {
@@ -98,7 +96,7 @@ public class pidTestLift extends OpMode {
             double ff = Math.cos(Math.toRadians(target / ticks_in_degrees)) * f;
             double power = pid + ff;
 
-            rightLift.setPower(power);
+            rightLift.setPower(-power);
             leftLift.setPower(power);
 
             telemetry.addData("left lift pos", getLeftPos());

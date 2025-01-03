@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-import alphabots.pedroPathing.util.Timer;
+import com.pedropathing.util.Timer;
 
 public class IntakeSubsystem { //STILL NEED TO CODE WIPER
     public enum IntakeState {

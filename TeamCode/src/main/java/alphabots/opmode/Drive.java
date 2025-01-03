@@ -5,7 +5,7 @@ import static alphabots.config.util.FieldConstants.*;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import alphabots.pedroPathing.follower.Follower;
+import com.pedropathing.follower.Follower;
 import alphabots.config.runmodes.Teleop;
 
 

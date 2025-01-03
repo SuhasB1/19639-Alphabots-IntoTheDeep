@@ -1,4 +1,4 @@
-package alphabots.pedroPathing.tuners_tests.automatic;
+package alphabots.pedropathing.tuners_tests.automatic;
 
 
 import static com.pedropathing.follower.FollowerConstants.leftFrontMotorName;
@@ -29,8 +29,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import alphabots.pedroPathing.constants.FConstants;
-import alphabots.pedroPathing.constants.LConstants;
+import alphabots.pedropathing.constants.FConstants;
+import alphabots.pedropathing.constants.LConstants;
 
 /**
  * This is the StrafeVelocityTuner autonomous follower OpMode. This runs the robot right at max

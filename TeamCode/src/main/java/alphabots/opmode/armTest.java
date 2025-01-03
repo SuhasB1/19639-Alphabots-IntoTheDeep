@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import alphabots.config.subsystem.IntakeSubsystem;
-import alphabots.pedroPathing.follower.Follower;
+import com.pedropathing.follower.Follower;
 
 @Config
 @TeleOp(name="intakeTest", group="a")

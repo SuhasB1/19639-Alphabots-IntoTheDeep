@@ -2,7 +2,7 @@ package alphabots.config.util;
 
 import com.acmerobotics.dashboard.config.Config;
 
-import alphabots.pedroPathing.localization.Pose;
+import com.pedropathing.localization.Pose;
 
 @Config
 public class FieldConstants {

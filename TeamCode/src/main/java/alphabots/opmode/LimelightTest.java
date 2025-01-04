@@ -12,16 +12,40 @@ import com.pedropathing.localization.Pose;
 @Config
 public class LimelightTest extends OpMode {
 
-    private LimelightSubsystem limelight;
+    private Teleop teleop;
+    private LimelightSubsystem limelightSubsystem;
 
     @Override
     public void init() {
-        limelight = new LimelightSubsystem(hardwareMap, telemetry, FieldConstants.observationStartPose, new Pose(36,72, Math.toRadians(0)));
-        limelight.init();
+        teleop = new Teleop(hardwareMap, telemetry, new Follower(hardwareMap), observationParkPose, false, gamepad1, gamepad2);
+        teleop.init();
+
+        limelightSubsystem = new LimelightSubsystem(hardwareMap, telemetry, observationParkPose, observationParkPose);
+        limelightSubsystem.init();
+
+        //checks for red
+        limelightSubsystem.switchPipeline(LimelightSubsystem.limelightState.red);
+    }
+
+    @Override
+    public void start() {
+        teleop.start();
+        limelightSubsystem.start();
     }
 
     @Override
     public void loop() {
+        teleop.update();
 
+        limelightSubsystem.update();
+
+        //checks for red
+        if (limelightSubsystem.state == LimelightSubsystem.limelightState.red) {
+            telemetry.addData("Color Detection", "Red detected");
+        } else {
+            telemetry.addData("Color Detection", "No red detected");
+        }
+
+        telemetry.update();
     }
 }

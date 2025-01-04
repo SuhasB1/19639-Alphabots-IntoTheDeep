@@ -1,6 +1,8 @@
 package alphabots.config.subsystem;
 
 import static alphabots.config.util.RobotConstants.*;
+
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -14,11 +16,11 @@ public class OuttakeSubsystem {
     }
 
     public enum RotateState {
-        TRANSFER, SCORE, SPECIMENGRAB, SPECIMENSCORE
+        TRANSFER, SCORE, SPECIMENGRAB, SPECIMENSCORE, IDLE
     }
     
     public enum PivotState {
-        TRANSFER, SCORE, SPECIMENGRAB, SPECIMENSCORE
+        TRANSFER, SCORE, SPECIMENGRAB, SPECIMENSCORE, IDLE
     }
 
     public enum SpinState {
@@ -39,6 +41,7 @@ public class OuttakeSubsystem {
         spin = hardwareMap.get(Servo.class, "oS");
         leftPivot = hardwareMap.get(Servo.class, "oLP");
         rightPivot = hardwareMap.get(Servo.class, "oRP");
+        rightPivot.setDirection(Servo.Direction.REVERSE);
         this.telemetry = telemetry;
         this.grabState = grabState;
         this.rotateState = rotateState;
@@ -59,7 +62,11 @@ public class OuttakeSubsystem {
         } else if (state == RotateState.SPECIMENSCORE) {
             rotate.setPosition(outtakeRotateSpecimenScore);
             this.rotateState = RotateState.SPECIMENSCORE;
-        }
+        } else if (state == RotateState.IDLE) {
+            rotate.setPosition(outtakeRotateIdle);
+            this.rotateState = RotateState.IDLE;
+    }
+
     }
 
     public void setGrabState(GrabState grabState) {
@@ -107,6 +114,10 @@ public class OuttakeSubsystem {
             leftPivot.setPosition(outtakePivotSpecimenScore);
             rightPivot.setPosition(outtakePivotSpecimenScore);
             this.pivotState = PivotState.SPECIMENSCORE;
+        } else if (pivotState == PivotState.IDLE) {
+            leftPivot.setPosition(outtakePivotIdle);
+            rightPivot.setPosition(outtakePivotIdle);
+            this.pivotState = PivotState.IDLE;
         }
     }
 
@@ -116,6 +127,13 @@ public class OuttakeSubsystem {
 
     public void close() {
         setGrabState(GrabState.CLOSED);
+    }
+
+    public void idle() {
+        setRotateState(RotateState.IDLE);
+        setPivotState(PivotState.IDLE);
+        setGrabState(GrabState.OPEN);
+        setSpinState(SpinState.FORWARD);
     }
 
     public void transfer() {
@@ -143,21 +161,15 @@ public class OuttakeSubsystem {
         setRotateState(RotateState.SPECIMENSCORE);
         setPivotState(PivotState.SPECIMENSCORE);
         setGrabState(GrabState.CLOSED);
-        setSpinState(SpinState.BACKWARD);
+        setSpinState(SpinState.FORWARD);
     } 
 
     public void init() {
-        setPivotState(PivotState.TRANSFER);
-        setRotateState(RotateState.TRANSFER);
-        setGrabState(GrabState.CLOSED);
-        setSpinState(SpinState.FORWARD);
+        idle();
     }
 
     public void start() {
-        setPivotState(PivotState.TRANSFER);
-        setRotateState(RotateState.TRANSFER);
-        setGrabState(GrabState.CLOSED);
-        setSpinState(SpinState.FORWARD);
+        idle();
     }
 
     public void telemetry() {

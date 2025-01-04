@@ -9,7 +9,7 @@ import com.pedropathing.follower.Follower;
 
 @Config
 @TeleOp(name="intakeTest", group="a")
-public class armTest extends OpMode {
+public class intakeTest extends OpMode {
 
     private IntakeSubsystem intake;
     private IntakeSubsystem.IntakeState intakeBoxState;
@@ -32,12 +32,22 @@ public class armTest extends OpMode {
 
     @Override
     public void loop() {
+
         if(gamepad1.x) {
             intake.transfer();
         }
 
         if(gamepad1.y) {
             intake.ground();
+        }
+        if(gamepad1.a){
+            intake.hover();
+        }
+        if(gamepad1.dpad_left){
+            intake.swipeOpen();
+        }
+        if(gamepad1.dpad_right){
+            intake.swipeClose();
         }
         if(gamepad1.right_bumper) {
             intake.idle();

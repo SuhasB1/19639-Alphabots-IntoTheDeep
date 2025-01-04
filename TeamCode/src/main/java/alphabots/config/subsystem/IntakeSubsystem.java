@@ -27,10 +27,13 @@ public class IntakeSubsystem { //STILL NEED TO CODE WIPER
     private Telemetry telemetry;
 
     public IntakeSubsystem(HardwareMap hardwareMap, Telemetry telemetry, IntakeState intakeState, PivotState pivotState) {
-        intake = hardwareMap.get(CRServo.class, "iG");
+        intake = hardwareMap.get(CRServo.class, "iB");
         leftPivot = hardwareMap.get(Servo.class, "iLP");
         rightPivot = hardwareMap.get(Servo.class, "iRP");
         wiper = hardwareMap.get(Servo.class, "iW");
+        leftPivot.setDirection(Servo.Direction.FORWARD);
+        rightPivot.setDirection(Servo.Direction.REVERSE);
+        intake.setDirection(CRServo.Direction.REVERSE);
         this.telemetry = telemetry;
         this.intakeState = intakeState;
         this.pivotState = pivotState;
@@ -85,12 +88,15 @@ public class IntakeSubsystem { //STILL NEED TO CODE WIPER
         setIntakeState(IntakeState.INTAKE);
     }
 
-    public void swipe() {
-        wiperTimer.resetTimer();
+    public void outtake(){
+        setIntakeState(IntakeState.OUTTAKE);
+    }
+
+    public void swipeOpen() {
         wiper.setPosition(intakeWiperOpen);
-        if (wiperTimer.getElapsedTimeSeconds() > 0.25) {
-            wiper.setPosition(intakeWiperClose);
-        }
+    }
+    public void swipeClose() {
+        wiper.setPosition(intakeWiperClose);
     }
 
     public void idle() {

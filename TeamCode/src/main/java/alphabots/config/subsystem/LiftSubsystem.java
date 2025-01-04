@@ -21,8 +21,8 @@ public class LiftSubsystem {
     public RunAction toZero, toHighBucket, toHighChamber, toHumanPlayer, toTransfer, toPark;
     public PIDController liftPID;
     public static int target;
-    public static double p = 0.01, i = 0, d = 0;
-    public static double f = 0.005;
+    public static double p = 0.013, i = 0, d = 0.0002;
+    public static double f = 0.01;
 
 
     public LiftSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {

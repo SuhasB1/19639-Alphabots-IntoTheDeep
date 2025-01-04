@@ -12,9 +12,6 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-import com.pedropathing.pathgen.BezierCurve;
-import com.pedropathing.pathgen.PathChain;
-import com.pedropathing.pathgen.Point;
 import com.pedropathing.util.Timer;
 
 public class Teleop {
@@ -77,8 +74,8 @@ public class Teleop {
         outtake.init();
         extend.start();
         intake.start();
-        follower.setPose(startPose);
-        follower.startTeleopDrive();
+        //follower.setPose(startPose);
+        //follower.startTeleopDrive();
     }
 
     public void update() {
@@ -94,23 +91,33 @@ public class Teleop {
         else
             speed = 0.75;
 
-        lift.manual(gamepad2.right_trigger - gamepad2.left_trigger);
+        if (gamepad1.right_trigger > 0.1)
+            extend.toFull();
 
-        if (gamepad2.right_bumper)
+        if (gamepad1.left_trigger > 0.1)
+            extend.toZero();
+
+        if (gamepad1.right_bumper)
             extend.manual(30);
-        else if (gamepad2.left_bumper)
+        else if (gamepad1.left_bumper)
             extend.manual(-30);
         else
             extend.manual(0);
 
-        if (currentGamepad2.cross && !previousGamepad2.cross)
-            outtake.switchGrabState();
+        lift.manual(gamepad2.right_trigger - gamepad2.left_trigger);
 
-        if (currentGamepad2.triangle && !previousGamepad2.triangle)
-            transferPos();
+        if (currentGamepad2.triangle && !previousGamepad2.triangle){
+            outtake.switchGrabState(); //claw open or close
+        }
+
+        if (currentGamepad2.cross && !previousGamepad2.cross){
+            outtake.transfer();
+            lift.toZero();
+        }
+
 
         if (currentGamepad2.square && !previousGamepad2.square)
-            scoringPos();
+            outtake.score();
 
         if (currentGamepad2.dpad_left && !previousGamepad2.dpad_left)
             specimenGrabPos();
@@ -121,18 +128,10 @@ public class Teleop {
         if (currentGamepad1.circle && !previousGamepad1.circle)
             intake.switchIntakeState();
 
-        if (currentGamepad1.cross && !previousGamepad1.cross)
+        if (currentGamepad2.cross && !previousGamepad2.cross)
             intake.switchOuttakeState();
 
-        if (gamepad2.left_stick_button) {
-            lift.hang = true;
-        }
-
-        if (gamepad2.right_stick_button) {
-            lift.hang = false;
-        }
-
-        follower.setTeleOpMovementVectors(flip * -gamepad1.left_stick_y * speed, flip * -gamepad1.left_stick_x * speed, -gamepad1.right_stick_x * speed * 0.5, !fieldCentric);
+        //follower.setTeleOpMovementVectors(flip * -gamepad1.left_stick_y * speed, flip * -gamepad1.left_stick_x * speed, -gamepad1.right_stick_x * speed * 0.5, !fieldCentric);
 
 
         lift.updatePIDF();

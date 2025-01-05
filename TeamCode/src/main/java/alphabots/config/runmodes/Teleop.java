@@ -12,12 +12,15 @@ import alphabots.config.util.VariableStorage;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import com.pedropathing.util.Timer;
+
+import java.util.List;
 
 public class Teleop {
 
@@ -50,6 +53,7 @@ public class Teleop {
     private Gamepad currentGamepad2 = new Gamepad();
     private Gamepad previousGamepad1 = new Gamepad();
     private Gamepad previousGamepad2 = new Gamepad();
+    List<LynxModule> allHubs;
 
 
     public double speed = 0.75;
@@ -62,6 +66,7 @@ public class Teleop {
         lift = new LiftSubsystem(hardwareMap, telemetry);
         extend = new ExtendSubsystem(hardwareMap, telemetry);
         intake = new IntakeSubsystem(hardwareMap, telemetry, intakeBoxState, intakePivotState);
+        allHubs = hardwareMap.getAll(LynxModule.class);
 
         this.follower = follower;
         this.startPose = startPose;
@@ -81,6 +86,9 @@ public class Teleop {
         intake.start();
         lift.start();
         //follower.setPose(startPose);
+        for (LynxModule hub : allHubs) {
+            hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
+        }
     }
 
     public void start() {

@@ -15,7 +15,6 @@ public class LiftSubsystem {
     private Telemetry telemetry;
 
     public DcMotor rightLift, leftLift;
-    public boolean manual = false;
     public boolean hang = false;
     public int pos, bottom;
     public RunAction toZero, toHighBucket, toHighChamber, toHumanPlayer, toTransfer, toPark;
@@ -31,10 +30,10 @@ public class LiftSubsystem {
 
         rightLift = hardwareMap.get(DcMotor.class, "bottomLift");
         leftLift = hardwareMap.get(DcMotor.class, "topLift");
-
-        rightLift.setDirection(DcMotor.Direction.REVERSE);
+        //day b4 comp add variable storage
+        rightLift.setDirection(DcMotor.Direction.FORWARD);
         leftLift.setDirection(DcMotor.Direction.FORWARD);
-        rightLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
@@ -43,7 +42,7 @@ public class LiftSubsystem {
     }
 
     public void updatePIDF(){
-        if (!manual) {
+
             liftPID.setPID(p,i,d);
             
             rightLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -54,25 +53,14 @@ public class LiftSubsystem {
             double ff = Math.cos(Math.toRadians(target / ticks_in_degrees)) * f;
             double power = pid + ff;
 
-            rightLift.setPower(power);
+            rightLift.setPower(-power);
             leftLift.setPower(power);
-        }
-    }
 
-    public void manual(double n){
-        manual = true;
-
-        rightLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        leftLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        rightLift.setPower(n);
-        leftLift.setPower(n);
     }
 
     //Util
     public void targetCurrent() {
         setTarget(getPos());
-        manual = false;
     }
 
     public double getTarget() {
@@ -88,8 +76,8 @@ public class LiftSubsystem {
     }
 
     public int getPos() {
-        pos = rightLift.getCurrentPosition() - bottom;
-        return rightLift.getCurrentPosition() - bottom;
+        pos = leftLift.getCurrentPosition() - bottom;
+        return leftLift.getCurrentPosition() - bottom;
     }
 
     // OpMode
@@ -105,12 +93,10 @@ public class LiftSubsystem {
     //Presets
 
     public void toZero() {
-        manual = false;
         setTarget(liftToZero);
     }
 
     public void toHighBucket() {
-        manual = false;
         setTarget(liftToHighBucket);
     }
 

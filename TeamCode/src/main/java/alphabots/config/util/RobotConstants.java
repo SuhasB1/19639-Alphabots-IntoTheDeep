@@ -8,24 +8,24 @@ public class RobotConstants {
     // Outtake
     public static double outtakeGrabClose = 0.5; ///
     public static double outtakeGrabOpen = 0.7; ///
-    public static double outtakeRotateTransfer = 0.1; ///
-    public static double outtakeRotateSpecimenGrab = 0.33; ///
-    public static double outtakeRotateScore = 0.47;
-    public static double outtakeRotateSpecimenScore = 0.17;
+    public static double outtakeRotateTransfer = 0.15; ///
+    public static double outtakeRotateSpecimenGrab = 0.38; ///
+    public static double outtakeRotateScore = 0.63;
+    public static double outtakeRotateSpecimenScore = 0.38;
 
-    public static double outtakeRotateIdle = 0.2; ///
-    public static double outtakePivotTransfer= 1; ///
-    public static double outtakePivotScore = 0.68;
+    public static double outtakeRotateIdle = 0.15; ///
+    public static double outtakePivotTransfer= 0.58; ///
+    public static double outtakePivotScore = 0.77;
     public static double outtakePivotSpecimenGrab = 0.05; ///
-    public static double outtakePivotSpecimenScore = 0.53;
-    public static double outtakePivotIdle = 0.8; ///
+    public static double outtakePivotSpecimenScore = 0.2;
+    public static double outtakePivotIdle = 0.43; ///
 
     public static double outtakeSpinForward = 0.73; ///
 
     public static double outtakeSpinBackward = 0.62; ///
 
     // Intake
-    public static double intakeBoxIntake = 0.7; //
+    public static double intakeBoxIntake = 1; //
     public static double intakeBoxIdle = 0; //
     public static double intakeBoxOuttake = -1; //
     public static double intakePivotTransfer= 0.32; //
@@ -37,8 +37,8 @@ public class RobotConstants {
     // Lift Positions
     public static int liftToZero = -10;
     public static int liftToHumanPlayer = 0;
-    public static int liftToHighChamber = 680;
-    public static int liftToHighBucket = 2475;
+    public static int liftToHighChamber = 530;
+    public static int liftToHighBucket = 2200;
     public static int liftToLowBucket = 0;
     public static int liftToPark = 415;
 

@@ -47,7 +47,7 @@ public class ExampleBucketAuto extends OpMode {
     /** Start Pose of our robot */
     private final Pose startPose = new Pose(9, 111, Math.toRadians(270));
 
-    /** Scoring Pose of our robot. It is facing the speciman at a -45 degree (315 degree) angle. */
+    /** Scoring Pose of our robot. It is facing the wiper at a -45 degree (315 degree) angle. */
     private final Pose scorePose = new Pose(14, 129, Math.toRadians(315));
 
     /** Lowest (First) Sample from the Spike Mark */

@@ -87,11 +87,7 @@ public class Auto {
 
     public void update() {
         follower.update();
-
-        if(!liftPIDF)
-            lift.manual(liftManual);
-        else
-            lift.updatePIDF();
+        lift.updatePIDF();
 
         transfer();
         bucket();

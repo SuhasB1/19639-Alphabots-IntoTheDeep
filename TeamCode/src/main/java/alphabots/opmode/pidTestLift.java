@@ -61,7 +61,6 @@ public class pidTestLift extends OpMode {
         rightLift.setDirection(DcMotor.Direction.FORWARD);
         leftLift.setDirection(DcMotor.Direction.FORWARD);
         leftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightLift.setDirection(DcMotor.Direction.FORWARD);
         rightLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 

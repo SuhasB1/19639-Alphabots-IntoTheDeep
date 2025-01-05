@@ -30,10 +30,10 @@ public class Drive extends OpMode {
         rightRear = hardwareMap.get(DcMotor.class, "rightRear");
         rightFront = hardwareMap.get(DcMotor.class, "rightFront");
 
-        leftFront.setDirection(DcMotorSimple.Direction.FORWARD); //leftFront
-        leftRear.setDirection(DcMotorSimple.Direction.FORWARD);
-        rightRear.setDirection(DcMotorSimple.Direction.REVERSE);
-        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftFront.setDirection(DcMotorSimple.Direction.REVERSE); //leftFront
+        leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightRear.setDirection(DcMotorSimple.Direction.FORWARD);
+        rightFront.setDirection(DcMotorSimple.Direction.FORWARD);
 
 
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -62,7 +62,7 @@ public class Drive extends OpMode {
         double drive = 0;
         double denominator = 1;
 
-        drive = gamepad1.left_stick_y;
+        drive = -gamepad1.left_stick_y;
         strafe = gamepad1.right_stick_x * 1.1;
         rotate = gamepad1.left_stick_x;
         int multiplier = 1;

@@ -3,12 +3,15 @@ package alphabots.config.subsystem;
 import static alphabots.config.util.RobotConstants.*;
 
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import com.pedropathing.util.Timer;
+
+import alphabots.config.util.VariableStorage;
 
 public class IntakeSubsystem { //STILL NEED TO CODE WIPER
     public enum IntakeState {
@@ -21,6 +24,7 @@ public class IntakeSubsystem { //STILL NEED TO CODE WIPER
 
     public Servo leftPivot, rightPivot, wiper;
     public CRServo intake;
+    DigitalChannel pin0, pin1;
     public IntakeState intakeState;
     public PivotState pivotState;
     public Timer wiperTimer = new Timer();
@@ -31,6 +35,8 @@ public class IntakeSubsystem { //STILL NEED TO CODE WIPER
         leftPivot = hardwareMap.get(Servo.class, "iLP");
         rightPivot = hardwareMap.get(Servo.class, "iRP");
         wiper = hardwareMap.get(Servo.class, "iW");
+        pin0 = hardwareMap.digitalChannel.get("digital0");
+        pin1 = hardwareMap.digitalChannel.get("digital1");
         leftPivot.setDirection(Servo.Direction.FORWARD);
         rightPivot.setDirection(Servo.Direction.REVERSE);
         intake.setDirection(CRServo.Direction.REVERSE);
@@ -128,6 +134,19 @@ public class IntakeSubsystem { //STILL NEED TO CODE WIPER
         setIntakeState(IntakeState.IDLE);
         wiper.setPosition(intakeWiperClose);
 
+    }
+
+    public void autoOuttake(){
+        if(VariableStorage.currentTeam == VariableStorage.Team.RED){
+            if(pin0.getState() && !pin1.getState()){
+                outtake();
+            }
+        }
+        if(VariableStorage.currentTeam == VariableStorage.Team.BLUE){
+            if(!pin0.getState() && pin1.getState()){
+                outtake();
+            }
+        }
     }
 
     public void telemetry() {

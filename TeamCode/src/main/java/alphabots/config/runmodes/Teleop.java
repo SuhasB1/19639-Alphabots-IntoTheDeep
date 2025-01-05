@@ -1,5 +1,7 @@
 package alphabots.config.runmodes;
 
+import static java.lang.Math.abs;
+
 import alphabots.config.subsystem.OuttakeSubsystem;
 import alphabots.config.subsystem.ExtendSubsystem;
 import alphabots.config.subsystem.IntakeSubsystem;
@@ -29,6 +31,10 @@ public class Teleop {
     private OuttakeSubsystem.RotateState outtakeRotateState;
     private OuttakeSubsystem.SpinState outtakeSpinState;
 
+    private Timer transferTimer = new Timer(), specimanTimer = new Timer(), sampleTimer = new Timer(), resetTimer = new Timer();
+
+    private int transferState = -1, specimanState = -1, sampleState = -1, resetState = -1;
+
 
 
 
@@ -44,7 +50,6 @@ public class Teleop {
     private Gamepad previousGamepad2 = new Gamepad();
 
 
-    private int flip = 1;
     public double speed = 0.75;
 
     private boolean fieldCentric;
@@ -67,7 +72,12 @@ public class Teleop {
         this.gamepad2 = gamepad2;
     }
 
-    public void init() {}
+    public void init() {
+        transferState = -1;
+        specimanState = -1;
+        sampleState = -1;
+        resetState = -1;
+    }
 
     public void start() {
         extend.setLimitToSample();
@@ -104,16 +114,34 @@ public class Teleop {
         else
             extend.manual(0);
 
+        if (currentGamepad1.circle && !previousGamepad1.circle)
+            intake.switchIntakeState();
+
+        if (currentGamepad1.cross && !previousGamepad1.cross)
+            intake.switchOuttakeState();
+
         lift.manual(gamepad2.right_trigger - gamepad2.left_trigger);
 
-        if (currentGamepad2.triangle && !previousGamepad2.triangle){
+        if (currentGamepad2.left_bumper && !previousGamepad2.left_bumper){
             outtake.switchGrabState(); //claw open or close
         }
 
         if (currentGamepad2.cross && !previousGamepad2.cross){
-            outtake.transfer();
             lift.toZero();
         }
+        if (currentGamepad2.square && !previousGamepad2.square){
+            startTransfer();
+        }
+        if (currentGamepad2.triangle && !previousGamepad2.triangle){
+            startSample();
+        }
+        if (currentGamepad2.dpad_left && !previousGamepad2.dpad_left){
+            specimenGrabPos();
+        }
+        if (currentGamepad2.dpad_up && !previousGamepad2.dpad_up){
+            startspeciman();
+        }
+
 
 
         if (currentGamepad2.square && !previousGamepad2.square)
@@ -125,16 +153,13 @@ public class Teleop {
         if (currentGamepad2.dpad_right && !previousGamepad2.dpad_right)
             specimenScorePos();
 
-        if (currentGamepad1.circle && !previousGamepad1.circle)
-            intake.switchIntakeState();
-
-        if (currentGamepad2.cross && !previousGamepad2.cross)
-            intake.switchOuttakeState();
-
         //follower.setTeleOpMovementVectors(flip * -gamepad1.left_stick_y * speed, flip * -gamepad1.left_stick_x * speed, -gamepad1.right_stick_x * speed * 0.5, !fieldCentric);
 
 
         lift.updatePIDF();
+        transfer();
+        sample();
+        speciman();
 
         follower.update();
         telemetry.addData("X: ", follower.getPose().getX());
@@ -148,25 +173,129 @@ public class Teleop {
     }
 
     private void scoringPos() {
-        extend.setLimitToSample();
         intake.transfer();
         outtake.score();
     }
 
     private void transferPos() {
-        extend.setLimitToSample();
         intake.transfer();
         outtake.transfer();
     }
 
     private void specimenGrabPos() {
-        extend.setLimitToSpecimen();
         outtake.specimenGrab();
     }
 
     private void specimenScorePos() {
-        extend.setLimitToSpecimen();
         outtake.specimenScore();
+    }
+
+    private void transfer() {
+        switch (transferState) {
+            case 0:
+                lift.toZero();
+                outtake.idle();
+                outtake.open();
+                intake.transfer();
+                extend.toZero();
+                telemetry.addLine("started 1");
+                setTransferState(1);
+                break;
+            case 1:
+                if (transferTimer.getElapsedTimeSeconds() > 1 && abs(extend.getPos()) < 30 && abs(lift.getPos()) < 30) {
+                    outtake.transfer();
+                    telemetry.addLine("started 2");
+                    setTransferState(2);
+                }
+                break;
+            case 2:
+                if (transferTimer.getElapsedTimeSeconds() > 1) {
+                    outtake.close();
+                    telemetry.addLine("started 3");
+                    setTransferState(3);
+                }
+                break;
+            case 3:
+                if (transferTimer.getElapsedTimeSeconds() > 0.25) {
+                    outtake.close();
+                    telemetry.addLine("started 4");
+                    setTransferState(-1);
+                }
+                break;
+        }
+    }
+
+    public void setTransferState(int x) {
+        transferState = x;
+        transferTimer.resetTimer();
+    }
+
+    public void startTransfer() {
+        setTransferState(0);
+    }
+
+    private void sample() {
+        switch (sampleState) {
+            case 0:
+                outtake.idle();
+                lift.toHighBucket();
+                setSampleState(1);
+                break;
+            case 1:
+                if (abs(lift.getTarget() - lift.getPos()) < 70) {
+                    outtake.score();
+                    setSampleState(2);
+                }
+                break;
+            case 2:
+                if (abs(lift.getTarget() - lift.getPos()) < 20 && sampleTimer.getElapsedTimeSeconds() > 0.5) {
+                    outtake.open();
+                    setSampleState(3);
+                }
+                break;
+            case 3:
+                if (sampleTimer.getElapsedTimeSeconds() > 0.5) {
+                    outtake.idle();
+                    setSampleState(-1);
+                }
+                break;
+        }
+    }
+
+    public void setSampleState(int x) {
+        sampleState = x;
+        sampleTimer.resetTimer();
+    }
+
+    public void startSample() {
+        setSampleState(0);
+    }
+
+    private void speciman() {
+        switch (specimanState) {
+            case 0:
+                setspecimanState(1);
+                break;
+            case 1:
+                if(specimanTimer.getElapsedTimeSeconds() > 0.3) {
+                    setspecimanState(2);
+                }
+                break;
+            case 2:
+                if (specimanTimer.getElapsedTimeSeconds() > 0.25) {
+                    setspecimanState(-1);
+                }
+                break;
+        }
+    }
+
+    public void setspecimanState(int x) {
+        specimanState = x;
+        specimanTimer.resetTimer();
+    }
+
+    public void startspeciman() {
+        setspecimanState(0);
     }
 
 }

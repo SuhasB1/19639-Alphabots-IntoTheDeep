@@ -21,7 +21,7 @@ import alphabots.pedropathing.constants.LConstants;
  * There are examples of different ways to build paths.
  * A path progression method has been created and can advance based on time, position, or other factors.
  *
- * @author Baron Henderson - 20077 The Indubitables
+ * @author Baron Henderson - 20077 The alphabots
  * @version 2.0, 11/28/2024
  */
 
@@ -47,7 +47,7 @@ public class ExampleBucketAuto extends OpMode {
     /** Start Pose of our robot */
     private final Pose startPose = new Pose(9, 111, Math.toRadians(270));
 
-    /** Scoring Pose of our robot. It is facing the submersible at a -45 degree (315 degree) angle. */
+    /** Scoring Pose of our robot. It is facing the speciman at a -45 degree (315 degree) angle. */
     private final Pose scorePose = new Pose(14, 129, Math.toRadians(315));
 
     /** Lowest (First) Sample from the Spike Mark */

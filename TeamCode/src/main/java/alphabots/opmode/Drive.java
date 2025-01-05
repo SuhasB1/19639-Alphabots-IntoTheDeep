@@ -67,9 +67,6 @@ public class Drive extends OpMode {
         rotate = gamepad1.left_stick_x;
         int multiplier = 1;
 
-        driveForward = gamepad1.right_trigger;
-        driveBackward = gamepad1.left_trigger;
-
         denominator = Math.max(Math.abs(drive) + Math.abs(strafe) + Math.abs(rotate), 1);
         if(driveForward > 0) {
             rightFront.setPower(-driveForward * (multiplier));

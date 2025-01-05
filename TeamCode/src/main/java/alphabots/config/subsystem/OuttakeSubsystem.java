@@ -42,6 +42,7 @@ public class OuttakeSubsystem {
         leftPivot = hardwareMap.get(Servo.class, "oLP");
         rightPivot = hardwareMap.get(Servo.class, "oRP");
         rightPivot.setDirection(Servo.Direction.REVERSE);
+        grab.setDirection(Servo.Direction.REVERSE);
         this.telemetry = telemetry;
         this.grabState = grabState;
         this.rotateState = rotateState;

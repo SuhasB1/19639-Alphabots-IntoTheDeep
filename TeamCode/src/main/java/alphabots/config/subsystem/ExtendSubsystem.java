@@ -40,8 +40,11 @@ public class ExtendSubsystem {
 
             double pid = extendPID.calculate(getPos(), target);
             double power = pid;
-
+            if (Math.abs(power) < 0.1) {
+                power = 0.1 * Math.signum(power);
+            }
             extend.setPower(power);
+
         }
     }
 

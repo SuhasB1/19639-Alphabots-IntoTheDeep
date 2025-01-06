@@ -120,7 +120,6 @@ public class IntakeSubsystem { //STILL NEED TO CODE WIPER
 
     public void hover() {
         setPivotState(PivotState.HOVER);
-        setIntakeState(IntakeState.INTAKE);
     }
 
     public void init() {
@@ -152,5 +151,7 @@ public class IntakeSubsystem { //STILL NEED TO CODE WIPER
     public void telemetry() {
         telemetry.addData("Intake Box State: ", intakeState);
         telemetry.addData("Intake Pivot State: ", pivotState);
+        telemetry.addData("Pin0 State", pin0.getState());
+        telemetry.addData("Pin1 State", pin1.getState());
     }
 }

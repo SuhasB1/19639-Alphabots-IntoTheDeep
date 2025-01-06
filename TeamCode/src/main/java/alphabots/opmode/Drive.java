@@ -64,7 +64,7 @@ public class Drive extends OpMode {
 
         drive = -gamepad1.left_stick_y;
         strafe = gamepad1.right_stick_x * 1.1;
-        rotate = -gamepad1.left_stick_x;
+        rotate = gamepad1.left_stick_x;
         int multiplier = 1;
 
         denominator = Math.max(Math.abs(drive) + Math.abs(strafe) + Math.abs(rotate), 1);
@@ -80,10 +80,10 @@ public class Drive extends OpMode {
             leftRear.setPower(driveBackward * multiplier);
 
         } else {
-            rightFront.setPower(((drive + strafe  + rotate) / denominator) * multiplier);
-            rightRear.setPower(((drive - rotate + strafe) / denominator) * multiplier);
-            leftFront.setPower(((drive - rotate - strafe) / denominator) * multiplier);
-            leftRear.setPower(((drive + rotate - strafe) / denominator) * multiplier);
+            rightFront.setPower(((drive + strafe  - rotate) / denominator) * multiplier);
+            rightRear.setPower(((drive + rotate + strafe) / denominator) * multiplier);
+            leftFront.setPower(((drive + rotate - strafe) / denominator) * multiplier);
+            leftRear.setPower(((drive - rotate - strafe) / denominator) * multiplier);
         }
     }
 

@@ -37,9 +37,9 @@ public class Teleop {
     private OuttakeSubsystem.RotateState outtakeRotateState;
     private OuttakeSubsystem.SpinState outtakeSpinState;
 
-    private Timer transferTimer = new Timer(), wiperTimer = new Timer(), sampleTimer = new Timer();
+    private Timer transferTimer = new Timer(), wiperTimer = new Timer(), sampleTimer = new Timer(), resetTimer = new Timer();
 
-    private int transferState = -1, wiperState = -1, sampleState = -1;
+    private int transferState = -1, wiperState = -1, sampleState = -1, resetState = -1;
 
 
 
@@ -129,7 +129,7 @@ public class Teleop {
             intake.switchOuttakeState();
 
         if (currentGamepad1.dpad_down && !previousGamepad1.dpad_down)
-            intake.switchOuttakeState();
+            startwiper();
 
         if (currentGamepad1.square && !previousGamepad1.square)
             intake.ground();
@@ -149,7 +149,7 @@ public class Teleop {
             outtake.switchGrabState(); //claw open or close
 
         if (currentGamepad2.cross && !previousGamepad2.cross)
-            lift.toZero();
+            startReset();
 
         if (currentGamepad2.square && !previousGamepad2.square)
             startTransfer();
@@ -175,7 +175,7 @@ public class Teleop {
 
         lift.updatePIDF();
         extend.updatePIDF();
-        intake.autoOuttake();
+        //intake.autoOuttake();
         transfer();
         sample();
         wiper();
@@ -211,7 +211,7 @@ public class Teleop {
                 setTransferState(1);
                 break;
             case 1:
-                if (transferTimer.getElapsedTimeSeconds() > 1 && extend.getPos() < 10 && lift.getPos() < 10) {
+                if (transferTimer.getElapsedTimeSeconds() > 1 && extend.getPos() < 30 && lift.getPos() < 30) {
                     outtake.transfer();
                     telemetry.addLine("started 2");
                     setTransferState(2);
@@ -240,6 +240,7 @@ public class Teleop {
         switch (sampleState) {
             case 0:
                 outtake.idle();
+                outtake.close();
                 lift.toHighBucket();
                 telemetry.addLine("started 1");
                 setSampleState(1);
@@ -247,15 +248,9 @@ public class Teleop {
             case 1:
                 if (lift.getPos() > RobotConstants.liftToHighBucket - 70) {
                     outtake.score();
+                    outtake.close();
                     telemetry.addLine("started 2");
                     setSampleState(2);
-                }
-                break;
-            case 2:
-                if (lift.getPos() > RobotConstants.liftToHighBucket - 20 && sampleTimer.getElapsedTimeSeconds() > 0.5) {
-                    outtake.open();
-                    telemetry.addLine("started 3");
-                    setSampleState(3);
                 }
                 break;
             case 3:
@@ -284,7 +279,7 @@ public class Teleop {
                 setwiperState(1);
                 break;
             case 1:
-                if(wiperTimer.getElapsedTimeSeconds() > 0.2) {
+                if(wiperTimer.getElapsedTimeSeconds() > 0.25) {
                     intake.swipeClose();
                     setwiperState(2);
                 }
@@ -301,4 +296,34 @@ public class Teleop {
         setwiperState(0);
     }
 
+    private void reset() {
+        switch (resetState) {
+            case 0:
+                outtake.open();
+                setResetState(1);
+                break;
+            case 1:
+                if (sampleTimer.getElapsedTimeSeconds() > 0.2) {
+                    outtake.idle();
+
+                    setResetState(2);
+                }
+                break;
+            case 2:
+                if (sampleTimer.getElapsedTimeSeconds() > 0.2) {
+                    lift.toZero();
+                    setResetState(-1);
+                }
+                break;
+        }
+    }
+
+    public void setResetState(int x) {
+        resetState = x;
+        resetTimer.resetTimer();
+    }
+
+    public void startReset() {
+        setResetState(0);
+    }
 }

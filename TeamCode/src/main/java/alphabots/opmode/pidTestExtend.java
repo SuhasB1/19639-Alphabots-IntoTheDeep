@@ -35,6 +35,7 @@ import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -54,8 +55,6 @@ public class pidTestExtend extends OpMode {
     @Override
     public void init() {
         extend = hardwareMap.get(DcMotor.class, "extend");
-
-        extend.setDirection(DcMotor.Direction.REVERSE);
         extend.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         extend.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
@@ -83,7 +82,7 @@ public class pidTestExtend extends OpMode {
         double pid = liftPID.calculate(getPos(), target);
         double power = pid;
 
-        extend.setPower(power);
+        extend.setPower(-power);
 
         telemetry.addData("extend pos", getPos());
         telemetry.addData("extend target", target);

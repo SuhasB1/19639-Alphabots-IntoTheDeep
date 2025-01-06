@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.subsystem;
+package alphabots.config.subsystem;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;

@@ -10,6 +10,8 @@ import alphabots.config.subsystem.ExtendSubsystem;
 import alphabots.config.subsystem.IntakeSubsystem;
 import alphabots.config.subsystem.LiftSubsystem;
 import alphabots.config.subsystem.DriveSubsystem;
+import alphabots.config.util.RobotConstants;
+
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.pedropathing.pathgen.BezierLine;
@@ -39,11 +41,10 @@ public class Auto {
     public Follower follower;
     public Telemetry telemetry;
 
-    public boolean actionBusy, liftPIDF = true;
-    public double liftManual = 0;
+    public boolean actionBusy;
 
-    public Timer transferTimer = new Timer(), bucketTimer = new Timer(), chamberTimer = new Timer(), intakeTimer = new Timer(), parkTimer = new Timer(), specimenTimer = new Timer(), chamberTimer2 = new Timer();
-    public int transferState = -1, bucketState = -1, chamberState = -1, intakeState = -1, parkState = -1, specimenState = -1;
+    public Timer transferTimer = new Timer(), bucketTimer = new Timer(), chamberScoreTimer = new Timer(), intakeTimer = new Timer(), parkTimer = new Timer(), specimenTimer = new Timer();
+    public int transferState = -1, bucketState = -1, chamberScoreState = -1, intakeState = -1, parkState = -1, specimenState = -1;
 
     public Path element1, score1, element2, score2, element3, score3;
     public PathChain pushSamples, preload,specimen1, specimen2, specimen3, specimen4, grab1, grab2, grab3, grab4, park;
@@ -88,10 +89,11 @@ public class Auto {
     public void update() {
         follower.update();
         lift.updatePIDF();
+        extend.updatePIDF();
 
         transfer();
         bucket();
-        chamber();
+        chamberScore();
         intake();
         park();
         specimen();
@@ -252,22 +254,24 @@ public class Auto {
                 actionBusy = true;
                 intake.transfer();
                 lift.toZero();
-                outtake.transfer();
+                outtake.idle();
+                outtake.open();
+                intake.transfer();
                 extend.toZero();
-                lift.toZero();
+                setTransferState(1);
                 transferTimer.resetTimer();
                 setTransferState(2);
                 break;
             case 2:
-                if (transferTimer.getElapsedTimeSeconds() > 1.5) {
-                    outtake.close();
+                if (transferTimer.getElapsedTimeSeconds() > 0.35 && extend.getPos() < 30 && lift.getPos() < 30) {
+                    outtake.transfer();
                     transferTimer.resetTimer();
                     setTransferState(3);
                 }
                 break;
             case 3:
-                if (transferTimer.getElapsedTimeSeconds() > 1) {
-                    intake.hover();
+                if (transferTimer.getElapsedTimeSeconds() > 0.2) {
+                    outtake.close();
                     transferTimer.resetTimer();
                     actionBusy = false;
                     setTransferState(-1);
@@ -290,27 +294,43 @@ public class Auto {
         switch (bucketState) {
             case 1:
                 actionBusy = true;
-                intake.transfer();
-                lift.toHighBucket();
+                outtake.idle();
                 outtake.close();
-                extend.toZero();
+                lift.toHighBucket();
                 bucketTimer.resetTimer();
                 setBucketState(2);
                 break;
             case 2:
-                if (bucketTimer.getElapsedTimeSeconds() > 0.5) {
-                    intake.hover();
+                if (lift.getPos() > RobotConstants.liftToHighBucket - 150) {
                     outtake.score();
+                    outtake.close();
                     bucketTimer.resetTimer();
                     setBucketState(3);
                 }
                 break;
             case 3:
-                if (bucketTimer.getElapsedTimeSeconds() > 1) {
+                if (bucketTimer.getElapsedTimeSeconds() > 0.18) {
+                    outtake.open();
+                    bucketTimer.resetTimer();
+                    setBucketState(4);
+                }
+            case 4:
+                if (bucketTimer.getElapsedTimeSeconds() > 0.2) {
+                    outtake.idle();
+                    bucketTimer.resetTimer();
+                    setBucketState(5);
+                }
+            case 5:
+                if (bucketTimer.getElapsedTimeSeconds() > 0.2) {
+                    lift.toZero();
+                    bucketTimer.resetTimer();
+                    setBucketState(6);
+                }
+            case 6:
+                if (lift.getPos() < 25) {
                     actionBusy = false;
                     setBucketState(-1);
                 }
-
         }
     }
 
@@ -324,38 +344,38 @@ public class Auto {
         }
     }
 
-    public void chamber() {
-        switch (chamberState) {
+    public void chamberScore() {
+        switch (chamberScoreState) {
             case 1:
                 actionBusy = true;
                 outtake.specimenScore();
                 extend.toZero();
-                chamberTimer.resetTimer();
-                setChamberState(2);
+                chamberScoreTimer.resetTimer();
+                setChamberScoreState(2);
                 break;
             case 2:
                 if ((follower.getPose().getX() >= specimen1Pose.getX() - 0.5)) {
-                    chamberTimer.resetTimer();
-                    setChamberState(3);
+                    chamberScoreTimer.resetTimer();
+                    setChamberScoreState(3);
                 }
                 break;
             case 3:
-                if(chamberTimer.getElapsedTimeSeconds() > 0.375) {
+                if(chamberScoreTimer.getElapsedTimeSeconds() > 0.375) {
                     outtake.open();
                     actionBusy = false;
-                    setChamberState(-1);
+                    setChamberScoreState(-1);
                 }
                 break;
         }
     }
 
-    public void setChamberState(int x) {
-        chamberState = x;
+    public void setChamberScoreState(int x) {
+        chamberScoreState = x;
     }
 
-    public void startChamber() {
+    public void startChamberScore() {
         if(actionNotBusy()) {
-            setChamberState(1);
+            setChamberScoreState(1);
         }
     }
 
@@ -368,10 +388,14 @@ public class Auto {
                 specimenTimer.resetTimer();
                 setSpecimenState(2);
             case 2:
-                if(specimenTimer.getElapsedTimeSeconds() > 0) {
-                    actionBusy = false;
-                    setSpecimenState(-1);
+                if(specimenTimer.getElapsedTimeSeconds() > 0.25) {
+                    outtake.close();
+                    setSpecimenState(3);
                 }
+                break;
+            case 3:
+                actionBusy = false;
+                setSpecimenState(-1);
                 break;
         }
     }
@@ -390,32 +414,30 @@ public class Auto {
         switch (intakeState) {
             case 1:
                 actionBusy = true;
-                outtake.open();
+                outtake.idle();
+                intake.intake();
+                intake.ground();
+                extend.toHalf();
                 intakeTimer.resetTimer();
                 setTransferState(2);
                 break;
             case 2:
-                if(intakeTimer.getElapsedTimeSeconds() > 0.5) {
-                    outtake.transfer();
-                    intake.hover();
-                    lift.toZero();
-                    outtake.open();
-                    extend.toHalf();
+                if(intakeTimer.getElapsedTimeSeconds() > 0.5 && (RobotConstants.extendFullSample/2) - extend.getPos() < 15) {
                     intakeTimer.resetTimer();
                     setTransferState(3);
                 }
                 break;
             case 3:
                 if (intakeTimer.getElapsedTimeSeconds() > 1) {
-                    intake.ground();
+                    intake.idle();
+                    intake.transfer();
+                    extend.toZero();
                     intakeTimer.resetTimer();
                     setTransferState(4);
                 }
                 break;
             case 4:
-                if (intakeTimer.getElapsedTimeSeconds() > 1.5) {
-                    intake.idle();
-                    intakeTimer.resetTimer();
+                if (intakeTimer.getElapsedTimeSeconds() > 0.7 && extend.getPos() < 15) {
                     actionBusy = false;
                     setTransferState(-1);
                 }
@@ -437,17 +459,16 @@ public class Auto {
         switch (parkState) {
             case 1:
                 actionBusy = true;
-                outtake.open();
+                outtake.idle();
+                intake.idle();
+                intake.transfer();
+                extend.toZero();
                 parkTimer.resetTimer();
                 setParkState(2);
                 break;
             case 2:
-                if(parkTimer.getElapsedTimeSeconds() > 0.5) {
-                    intake.transfer();
+                if(parkTimer.getElapsedTimeSeconds() > 0.3) {
                     lift.toPark();
-                    outtake.transfer();
-                    extend.toZero();
-                    parkTimer.resetTimer();
                     actionBusy = false;
                     setTransferState(-1);
                 }

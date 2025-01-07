@@ -29,7 +29,7 @@ public class RobotConstants {
     public static double intakeBoxIdle = 0; //
     public static double intakeBoxOuttake = -1; //
     public static double intakePivotTransfer= 0.32; //
-    public static double intakePivotGround = 0.95; //
+    public static double intakePivotGround = 0.94; //
     public static double intakePivotHover = 0.8; //
     public static double intakeWiperOpen = 0.3; //
     public static double intakeWiperClose = 1; //

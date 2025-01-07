@@ -131,8 +131,12 @@ public class Teleop {
         if (currentGamepad1.dpad_down && !previousGamepad1.dpad_down)
             startwiper();
 
-        if (currentGamepad1.square && !previousGamepad1.square)
+        if (currentGamepad1.square && !previousGamepad1.square) {
             intake.ground();
+            if (extend.getPos() < 10) {
+                extend.addToTarget(45);
+            }
+        }
 
         if (currentGamepad1.triangle && !previousGamepad1.triangle)
             intake.hover();
@@ -247,7 +251,7 @@ public class Teleop {
                 setSampleState(1);
                 break;
             case 1:
-                if (lift.getPos() > RobotConstants.liftToHighBucket - 70) {
+                if (lift.getPos() > RobotConstants.liftToHighBucket - 150) {
                     outtake.score();
                     outtake.close();
                     telemetry.addLine("started 2");

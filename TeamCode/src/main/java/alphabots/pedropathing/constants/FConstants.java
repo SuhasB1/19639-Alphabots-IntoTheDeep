@@ -15,8 +15,8 @@ public class FConstants {
         FollowerConstants.rightFrontMotorName = "rightFront";
         FollowerConstants.rightRearMotorName = "rightRear";
 
-        FollowerConstants.leftFrontMotorDirection = DcMotorSimple.Direction.REVERSE;
-        FollowerConstants.leftRearMotorDirection = DcMotorSimple.Direction.REVERSE;
+        FollowerConstants.leftFrontMotorDirection = DcMotorSimple.Direction.FORWARD;
+        FollowerConstants.leftRearMotorDirection = DcMotorSimple.Direction.FORWARD;
         FollowerConstants.rightFrontMotorDirection = DcMotorSimple.Direction.FORWARD;
         FollowerConstants.rightRearMotorDirection = DcMotorSimple.Direction.FORWARD;
 
@@ -48,5 +48,10 @@ public class FConstants {
         FollowerConstants.pathEndVelocityConstraint = 0.1;
         FollowerConstants.pathEndTranslationalConstraint = 0.1;
         FollowerConstants.pathEndHeadingConstraint = 0.007;
+
+        FollowerConstants.xMovement = 75.5638;
+        FollowerConstants.yMovement = 57.4951;
+        FollowerConstants.forwardZeroPowerAcceleration = -31.9741;
+
     }
 }

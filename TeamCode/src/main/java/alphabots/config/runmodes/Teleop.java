@@ -179,6 +179,7 @@ public class Teleop {
         transfer();
         sample();
         wiper();
+        reset();
 
         follower.update();
         telemetry.addData("X: ", follower.getPose().getX());
@@ -211,14 +212,14 @@ public class Teleop {
                 setTransferState(1);
                 break;
             case 1:
-                if (transferTimer.getElapsedTimeSeconds() > 1 && extend.getPos() < 30 && lift.getPos() < 30) {
+                if (transferTimer.getElapsedTimeSeconds() > 0.35 && extend.getPos() < 30 && lift.getPos() < 30) {
                     outtake.transfer();
                     telemetry.addLine("started 2");
                     setTransferState(2);
                 }
                 break;
             case 2:
-                if (transferTimer.getElapsedTimeSeconds() > 1) {
+                if (transferTimer.getElapsedTimeSeconds() > 0.2) {
                     outtake.close();
                     telemetry.addLine("started 3");
                     setTransferState(-1);
@@ -250,13 +251,6 @@ public class Teleop {
                     outtake.score();
                     outtake.close();
                     telemetry.addLine("started 2");
-                    setSampleState(2);
-                }
-                break;
-            case 3:
-                if (sampleTimer.getElapsedTimeSeconds() > 0.5) {
-                    outtake.idle();
-                    telemetry.addLine("started 4");
                     setSampleState(-1);
                 }
                 break;
@@ -303,14 +297,14 @@ public class Teleop {
                 setResetState(1);
                 break;
             case 1:
-                if (sampleTimer.getElapsedTimeSeconds() > 0.2) {
+                if (resetTimer.getElapsedTimeSeconds() > 0.2) {
                     outtake.idle();
 
                     setResetState(2);
                 }
                 break;
             case 2:
-                if (sampleTimer.getElapsedTimeSeconds() > 0.2) {
+                if (resetTimer.getElapsedTimeSeconds() > 0.2) {
                     lift.toZero();
                     setResetState(-1);
                 }

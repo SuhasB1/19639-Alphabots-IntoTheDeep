@@ -53,5 +53,9 @@ public class FConstants {
         FollowerConstants.yMovement = 57.4951;
         FollowerConstants.forwardZeroPowerAcceleration = -31.9741;
         FollowerConstants.lateralZeroPowerAcceleration = -75.1639;
+
+        FollowerConstants.useSecondaryTranslationalPID = true
+        FollowerConstants.useSecondaryHeadingPID = true
+        FollowerConstants.useSecondaryDrivePID = true
     }
 }

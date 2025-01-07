@@ -179,7 +179,7 @@ public class Teleop {
 
         lift.updatePIDF();
         extend.updatePIDF();
-        //intake.autoOuttake();
+        intake.autoOuttake();
         transfer();
         sample();
         wiper();

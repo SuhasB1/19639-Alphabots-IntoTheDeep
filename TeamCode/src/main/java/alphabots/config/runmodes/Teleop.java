@@ -131,7 +131,7 @@ public class Teleop {
         if (currentGamepad1.dpad_down && !previousGamepad1.dpad_down)
             startwiper();
 
-        if (currentGamepad1.square && !previousGamepad1.square) {
+        if (currentGamepad1.circle && !previousGamepad1.circle) {
             intake.ground();
             if (extend.getPos() < 10) {
                 extend.addToTarget(45);
@@ -141,7 +141,7 @@ public class Teleop {
         if (currentGamepad1.triangle && !previousGamepad1.triangle)
             intake.hover();
 
-        if (currentGamepad1.circle && !previousGamepad1.circle)
+        if (currentGamepad1.square && !previousGamepad1.square)
             intake.transfer();
 
         if (currentGamepad1.share && !previousGamepad1.share)
@@ -164,10 +164,10 @@ public class Teleop {
         if (currentGamepad2.dpad_left && !previousGamepad2.dpad_left)
             specimenGrabPos();
 
-        if (currentGamepad2.dpad_right && !previousGamepad2.dpad_right)
+        if (currentGamepad2.dpad_up && !previousGamepad2.dpad_up)
             specimenScorePos();
 
-        if (currentGamepad2.dpad_up && !previousGamepad2.dpad_up)
+        if (currentGamepad2.dpad_right && !previousGamepad2.dpad_right)
             lift.toHighChamber();
 
         if (currentGamepad2.share && !previousGamepad2.share){
@@ -185,7 +185,7 @@ public class Teleop {
         wiper();
         reset();
 
-        follower.update();
+        //follower.update();
         telemetry.addData("X: ", follower.getPose().getX());
         telemetry.addData("Y: ", follower.getPose().getY());
         telemetry.addData("Heading: ", follower.getPose().getHeading());

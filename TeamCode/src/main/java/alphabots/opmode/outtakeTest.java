@@ -4,7 +4,6 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.controller.PIDController;
-import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -24,8 +23,6 @@ public class outtakeTest extends OpMode {
     private OuttakeSubsystem.RotateState outtakeRotateState;
     private OuttakeSubsystem.SpinState outtakeSpinState;
 
-    private Follower follower;
-
     private IntakeSubsystem intake;
     private IntakeSubsystem.IntakeState intakeBoxState;
     private IntakeSubsystem.PivotState intakePivotState;
@@ -41,9 +38,7 @@ public class outtakeTest extends OpMode {
     @Override
     public void init() {
         outtake = new OuttakeSubsystem(hardwareMap, telemetry, outtakeGrabState, outtakeRotateState, outtakePivotState, outtakeSpinState);
-        follower = new Follower(hardwareMap);
         intake = new IntakeSubsystem(hardwareMap, telemetry, intakeBoxState, intakePivotState);
-        follower = new Follower(hardwareMap);
         posLeft = 0;
         posRight = 0;
         rightLift = hardwareMap.get(DcMotor.class, "bottomLift");
@@ -63,7 +58,6 @@ public class outtakeTest extends OpMode {
 
     @Override
     public void start() {
-        follower.startTeleopDrive();
         intake.start();
     }
 
@@ -114,8 +108,6 @@ public class outtakeTest extends OpMode {
         } else if (gamepad2.left_bumper) {
             intake.intake();
         }
-        follower.setTeleOpMovementVectors(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, true);
-        follower.update();
 
         telemetry.addData("left lift pos", getLeftPos());
         telemetry.addData("right lift pos", getRightPos());

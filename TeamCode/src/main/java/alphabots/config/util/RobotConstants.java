@@ -48,6 +48,8 @@ public class RobotConstants {
     public static int extendFullSample = 1350;
     public static int extendFullSpecimen = 1350;
 
+    public static boolean software_are_bums = true;
+
 
 
 }

@@ -1,4 +1,4 @@
-package alphabots.pedropathing.tuners_tests.automatic;
+package alphabots.pedroPathing.tuners_tests.automatic;
 
 import static com.pedropathing.follower.FollowerConstants.leftFrontMotorName;
 import static com.pedropathing.follower.FollowerConstants.leftRearMotorName;
@@ -28,8 +28,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import alphabots.pedropathing.constants.FConstants;
-import alphabots.pedropathing.constants.LConstants;
+import alphabots.pedroPathing.constants.FConstants;
+import alphabots.pedroPathing.constants.LConstants;
 
 /**
  * This is the ForwardVelocityTuner autonomous follower OpMode. This runs the robot forwards at max

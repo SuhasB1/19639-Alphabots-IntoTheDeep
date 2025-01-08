@@ -1,4 +1,4 @@
-package alphabots.pedropathing.constants;
+package alphabots.pedroPathing.constants;
 
 import com.pedropathing.localization.Localizers;
 import com.pedropathing.follower.FollowerConstants;
@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 public class FConstants {
     static {
-        FollowerConstants.localizers = Localizers.PINPOINT;
+        FollowerConstants.localizers = Localizers.THREE_WHEEL;
 
         FollowerConstants.leftFrontMotorName = "leftFront";
         FollowerConstants.leftRearMotorName = "leftRear";
@@ -20,13 +20,13 @@ public class FConstants {
         FollowerConstants.rightFrontMotorDirection = DcMotorSimple.Direction.FORWARD;
         FollowerConstants.rightRearMotorDirection = DcMotorSimple.Direction.FORWARD;
 
-        FollowerConstants.mass = 13.69849;
+        FollowerConstants.mass = 13;
 
-        FollowerConstants.xMovement = 77.0711;
-        FollowerConstants.yMovement = 57.89;
+        FollowerConstants.xMovement = 57.8741;
+        FollowerConstants.yMovement = 52.295;
 
-        FollowerConstants.forwardZeroPowerAcceleration = -26.5;
-        FollowerConstants.lateralZeroPowerAcceleration = -72.25;
+        FollowerConstants.forwardZeroPowerAcceleration = -41.278;
+        FollowerConstants.lateralZeroPowerAcceleration = -59.7819;
 
         FollowerConstants.translationalPIDFCoefficients.setCoefficients(0.1,0,0.01,0);
         FollowerConstants.useSecondaryTranslationalPID = false;
@@ -48,14 +48,5 @@ public class FConstants {
         FollowerConstants.pathEndVelocityConstraint = 0.1;
         FollowerConstants.pathEndTranslationalConstraint = 0.1;
         FollowerConstants.pathEndHeadingConstraint = 0.007;
-
-        FollowerConstants.xMovement = 75.5638;
-        FollowerConstants.yMovement = 57.4951;
-        FollowerConstants.forwardZeroPowerAcceleration = -31.9741;
-        FollowerConstants.lateralZeroPowerAcceleration = -75.1639;
-
-        FollowerConstants.useSecondaryTranslationalPID = true;
-        FollowerConstants.useSecondaryHeadingPID = true;
-        FollowerConstants.useSecondaryDrivePID = true;
     }
 }

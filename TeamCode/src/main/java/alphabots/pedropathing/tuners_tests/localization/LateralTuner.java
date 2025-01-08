@@ -1,4 +1,4 @@
-package alphabots.pedropathing.tuners_tests.localization;
+package alphabots.pedroPathing.tuners_tests.localization;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -12,8 +12,8 @@ import com.pedropathing.localization.PoseUpdater;
 import com.pedropathing.util.DashboardPoseTracker;
 import com.pedropathing.util.Drawing;
 
-import alphabots.pedropathing.constants.FConstants;
-import alphabots.pedropathing.constants.LConstants;
+import alphabots.pedroPathing.constants.FConstants;
+import alphabots.pedroPathing.constants.LConstants;
 
 /**
  * This is the LateralTuner OpMode. This tracks the strafe movement of the robot and displays the

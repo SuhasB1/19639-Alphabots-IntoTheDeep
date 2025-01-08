@@ -1,4 +1,6 @@
-package alphabots.pedropathing.examples;
+package alphabots.pedroPathing.examples;
+
+import android.provider.SyncStateContract;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
@@ -6,13 +8,13 @@ import com.pedropathing.util.Constants;
 import  com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import alphabots.pedropathing.constants.FConstants;
-import alphabots.pedropathing.constants.LConstants;
+import alphabots.pedroPathing.constants.FConstants;
+import alphabots.pedroPathing.constants.LConstants;
 
 /**
  * This is an example teleop that showcases movement and robot-centric driving.
  *
- * @author Baron Henderson - 20077 The alphabots
+ * @author Baron Henderson - 20077 The Indubitables
  * @version 2.0, 12/30/2024
  */
 

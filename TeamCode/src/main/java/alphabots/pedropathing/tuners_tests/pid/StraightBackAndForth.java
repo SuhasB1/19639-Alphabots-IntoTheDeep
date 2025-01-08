@@ -1,4 +1,4 @@
-package alphabots.pedropathing.tuners_tests.pid;
+package alphabots.pedroPathing.tuners_tests.pid;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -13,8 +13,8 @@ import com.pedropathing.pathgen.BezierLine;
 import com.pedropathing.pathgen.Path;
 import com.pedropathing.pathgen.Point;
 
-import alphabots.pedropathing.constants.FConstants;
-import alphabots.pedropathing.constants.LConstants;
+import alphabots.pedroPathing.constants.FConstants;
+import alphabots.pedroPathing.constants.LConstants;
 
 /**
  * This is the StraightBackAndForth autonomous OpMode. It runs the robot in a specified distance

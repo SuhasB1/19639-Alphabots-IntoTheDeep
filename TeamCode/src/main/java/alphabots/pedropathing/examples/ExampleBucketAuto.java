@@ -1,4 +1,4 @@
-package alphabots.pedropathing.examples;
+package alphabots.pedroPathing.examples;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
@@ -12,8 +12,8 @@ import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import  com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-import alphabots.pedropathing.constants.FConstants;
-import alphabots.pedropathing.constants.LConstants;
+import alphabots.pedroPathing.constants.FConstants;
+import alphabots.pedroPathing.constants.LConstants;
 
 /**
  * This is an example auto that showcases movement and control of two servos autonomously.
@@ -21,7 +21,7 @@ import alphabots.pedropathing.constants.LConstants;
  * There are examples of different ways to build paths.
  * A path progression method has been created and can advance based on time, position, or other factors.
  *
- * @author Baron Henderson - 20077 The alphabots
+ * @author Baron Henderson - 20077 The Indubitables
  * @version 2.0, 11/28/2024
  */
 
@@ -47,7 +47,7 @@ public class ExampleBucketAuto extends OpMode {
     /** Start Pose of our robot */
     private final Pose startPose = new Pose(9, 111, Math.toRadians(270));
 
-    /** Scoring Pose of our robot. It is facing the wiper at a -45 degree (315 degree) angle. */
+    /** Scoring Pose of our robot. It is facing the submersible at a -45 degree (315 degree) angle. */
     private final Pose scorePose = new Pose(14, 129, Math.toRadians(315));
 
     /** Lowest (First) Sample from the Spike Mark */
@@ -149,7 +149,7 @@ public class ExampleBucketAuto extends OpMode {
             case 1:
 
                 /* You could check for
-                - Follower State: "if(!follower.isBusy() {}" (Though, I don't recommend this because it might not return due to holdEnd
+                - Follower State: "if(!follower.isBusy() {}"
                 - Time: "if(pathTimer.getElapsedTimeSeconds() > 1) {}"
                 - Robot Position: "if(follower.getPose().getX() > 36) {}"
                 */

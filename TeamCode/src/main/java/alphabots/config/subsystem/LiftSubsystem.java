@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
+import alphabots.config.util.RobotConstants;
 import alphabots.config.util.action.RunAction;
 
 public class LiftSubsystem {
@@ -21,7 +22,7 @@ public class LiftSubsystem {
     public PIDController liftPID;
     public static int target;
     public static double p = 0.013, i = 0, d = 0.0002;
-    public static double f = 0.01;
+    public static double f = 0.1;
 
 
     public LiftSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
@@ -31,9 +32,10 @@ public class LiftSubsystem {
         rightLift = hardwareMap.get(DcMotor.class, "bottomLift");
         leftLift = hardwareMap.get(DcMotor.class, "topLift");
         //day b4 comp add variable storage
-        rightLift.setDirection(DcMotor.Direction.FORWARD);
+        rightLift.setDirection(DcMotor.Direction.REVERSE);
         leftLift.setDirection(DcMotor.Direction.FORWARD);
         leftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
@@ -45,17 +47,20 @@ public class LiftSubsystem {
 
             liftPID.setPID(p,i,d);
             
-            rightLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-            leftLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+            rightLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            leftLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
             double pid = liftPID.calculate(getPos(), target);
             double ticks_in_degrees = 537.7 / 360.0;
             double ff = Math.cos(Math.toRadians(target / ticks_in_degrees)) * f;
             double power = pid + ff;
-
-            rightLift.setPower(-power);
+            if (target == liftToZero) {
+                if (power<= -0.75){
+                    power = -0.75;
+                }
+            }
+            rightLift.setPower(power);
             leftLift.setPower(power);
-
     }
 
     //Util
@@ -76,14 +81,13 @@ public class LiftSubsystem {
     }
 
     public int getPos() {
-        pos = leftLift.getCurrentPosition() - bottom;
-        return leftLift.getCurrentPosition() - bottom;
+        pos = rightLift.getCurrentPosition();
+        return rightLift.getCurrentPosition();
     }
 
     // OpMode
     public void init() {
         liftPID.setPID(p,i,d);
-        bottom = getPos();
     }
 
     public void start() {

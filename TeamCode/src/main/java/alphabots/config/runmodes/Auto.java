@@ -31,7 +31,7 @@ public class Auto {
     private OuttakeSubsystem.GrabState outtakeGrabState;
     private OuttakeSubsystem.PivotState outtakePivotState;
     private OuttakeSubsystem.RotateState outtakeRotateState;
-    private OuttakeSubsystem.RotateState outtakeSpinState;
+    private OuttakeSubsystem.SpinState outtakeSpinState;
 
 
     public LiftSubsystem lift;
@@ -51,8 +51,10 @@ public class Auto {
     public Pose startPose, preloadPose, sample1Pose, sample1ControlPose, sample2Pose, sample2ControlPose, sample3Pose, sample3ControlPose, sampleScorePose, parkControlPose, parkPose, grab1Pose, specimen1Pose, grab2Pose, specimen2Pose, grab3Pose, specimen3Pose, grab4Pose, specimen4Pose, specimenSetPose;
 
     public Auto(HardwareMap hardwareMap, Telemetry telemetry, Follower follower, boolean isBlue, boolean isBucket) {
+        outtake = new OuttakeSubsystem(hardwareMap, telemetry, outtakeGrabState, outtakeRotateState, outtakePivotState, outtakeSpinState);
         lift = new LiftSubsystem(hardwareMap, telemetry);
         extend = new ExtendSubsystem(hardwareMap, telemetry);
+        intake = new IntakeSubsystem(hardwareMap, telemetry, intakeBoxState, intakePivotState);
 
         this.follower = follower;
         this.telemetry = telemetry;
@@ -66,37 +68,17 @@ public class Auto {
     }
 
     public void init() {
-        outtake.init();
-        lift.init();
-        extend.toZero();
-        lift.toZero();
-        intake.init();
         telemetryUpdate();
 
         follower.setStartingPose(startPose);
     }
 
     public void start() {
-        lift.start();
-        extend.start();
-        extend.toZero();
-        intake.start();
-        outtake.close();
-
         follower.setStartingPose(startPose);
     }
 
     public void update() {
         follower.update();
-        lift.updatePIDF();
-        extend.updatePIDF();
-
-        transfer();
-        bucket();
-        chamberScore();
-        intake();
-        park();
-        specimen();
         telemetryUpdate();
     }
 
@@ -498,7 +480,7 @@ public class Auto {
         follower.update();
         telemetry.addData("X: ", follower.getPose().getX());
         telemetry.addData("Y: ", follower.getPose().getY());
-        telemetry.addData("Heading: ", follower.getPose().getHeading());
+        telemetry.addData("Heading: ", Math.toDegrees(follower.getPose().getHeading()));
         telemetry.addData("Action Busy?: ", actionBusy);
         extend.telemetry();
         lift.telemetry();

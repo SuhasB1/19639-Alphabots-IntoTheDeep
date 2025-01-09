@@ -14,6 +14,7 @@ import com.pedropathing.localization.Pose;
 
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -23,6 +24,10 @@ import com.pedropathing.util.Timer;
 import java.util.List;
 
 public class Teleop {
+    DcMotor rightFront;
+    DcMotor leftFront;
+    DcMotor leftRear;
+    DcMotor rightRear;
 
 
     private ExtendSubsystem extend;
@@ -53,7 +58,6 @@ public class Teleop {
     private Gamepad currentGamepad2 = new Gamepad();
     private Gamepad previousGamepad1 = new Gamepad();
     private Gamepad previousGamepad2 = new Gamepad();
-    List<LynxModule> allHubs;
 
 
     public double speed = 0.75;
@@ -66,7 +70,22 @@ public class Teleop {
         lift = new LiftSubsystem(hardwareMap, telemetry);
         extend = new ExtendSubsystem(hardwareMap, telemetry);
         intake = new IntakeSubsystem(hardwareMap, telemetry, intakeBoxState, intakePivotState);
-        allHubs = hardwareMap.getAll(LynxModule.class);
+
+        leftFront = hardwareMap.get(DcMotor.class, "leftFront");
+        leftRear = hardwareMap.get(DcMotor.class, "leftRear");
+        rightRear = hardwareMap.get(DcMotor.class, "rightRear");
+        rightFront = hardwareMap.get(DcMotor.class, "rightFront");
+
+        leftFront.setDirection(DcMotorSimple.Direction.REVERSE); //leftFront
+        leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightRear.setDirection(DcMotorSimple.Direction.FORWARD);
+        rightFront.setDirection(DcMotorSimple.Direction.FORWARD);
+
+
+        leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         this.follower = follower;
         this.startPose = startPose;
@@ -85,14 +104,6 @@ public class Teleop {
         extend.start();
         intake.start();
         lift.start();
-        //follower.setPose(startPose);
-        for (LynxModule hub : allHubs) {
-            hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
-        }
-    }
-
-    public void start() {
-        //follower.startTeleopDrive();
     }
 
     public void update() {
@@ -102,15 +113,12 @@ public class Teleop {
         currentGamepad2.copy(gamepad2);
 
         //driver
-        if (gamepad1.right_bumper)
-            speed = 1;
-        else if (gamepad1.left_bumper)
-            speed = 0.25;
-        else
-            speed = 0.75;
 
         if (gamepad1.right_trigger > 0.1)
-            extend.toFull();
+            speed = 0.25;
+        else{
+            speed = 0.7;
+        }
 
         if (gamepad1.left_trigger > 0.1)
             extend.toZero();
@@ -122,20 +130,11 @@ public class Teleop {
         else
             extend.addToTarget(0);
 
-        if (currentGamepad1.dpad_left && !previousGamepad1.dpad_left)
-            intake.switchIntakeState();
-
-        if (currentGamepad1.dpad_right && !previousGamepad1.dpad_right)
-            intake.switchOuttakeState();
-
         if (currentGamepad1.dpad_down && !previousGamepad1.dpad_down)
             startwiper();
 
         if (currentGamepad1.circle && !previousGamepad1.circle) {
             intake.ground();
-            if (extend.getPos() < 10) {
-                extend.addToTarget(45);
-            }
         }
 
         if (currentGamepad1.triangle && !previousGamepad1.triangle)
@@ -151,6 +150,15 @@ public class Teleop {
         //operator
         if (currentGamepad2.left_bumper && !previousGamepad2.left_bumper)
             outtake.switchGrabState(); //claw open or close
+
+        if (currentGamepad2.right_bumper && !previousGamepad2.right_bumper)
+            intake.switchIntakeState();
+
+        if (currentGamepad2.options && !previousGamepad2.options)
+            intake.switchOuttakeState();
+
+        if (currentGamepad2.circle && !previousGamepad2.circle)
+            outtake.idle();
 
         if (currentGamepad2.cross && !previousGamepad2.cross)
             startReset();
@@ -170,13 +178,6 @@ public class Teleop {
         if (currentGamepad2.dpad_right && !previousGamepad2.dpad_right)
             lift.toHighChamber();
 
-        if (currentGamepad2.share && !previousGamepad2.share){
-            lift.leftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        }
-
-        //follower.setTeleOpMovementVectors(flip * -gamepad1.left_stick_y * speed, flip * -gamepad1.left_stick_x * speed, -gamepad1.right_stick_x * speed * 0.5, !fieldCentric);
-
-
         lift.updatePIDF();
         extend.updatePIDF();
         intake.autoOuttake();
@@ -184,11 +185,9 @@ public class Teleop {
         sample();
         wiper();
         reset();
+        moveDriveTrain();
 
         //follower.update();
-        telemetry.addData("X: ", follower.getPose().getX());
-        telemetry.addData("Y: ", follower.getPose().getY());
-        telemetry.addData("Heading: ", follower.getPose().getHeading());
         extend.telemetry();
         lift.telemetry();
         outtake.telemetry();
@@ -207,16 +206,14 @@ public class Teleop {
     private void transfer() {
         switch (transferState) {
             case 0:
-                lift.toZero();
                 outtake.idle();
                 outtake.open();
                 intake.transfer();
-                extend.toZero();
                 telemetry.addLine("started 1");
                 setTransferState(1);
                 break;
             case 1:
-                if (transferTimer.getElapsedTimeSeconds() > 0.35 && extend.getPos() < 30 && lift.getPos() < 30) {
+                if (transferTimer.getElapsedTimeSeconds() > 0.35) {
                     outtake.transfer();
                     telemetry.addLine("started 2");
                     setTransferState(2);
@@ -323,5 +320,28 @@ public class Teleop {
 
     public void startReset() {
         setResetState(0);
+    }
+
+    public void moveDriveTrain()
+    {
+
+        double y = -gamepad1.left_stick_y; // Remember, this is reversed!
+        double x = gamepad1.left_stick_x; // this is strafing
+        double rx = gamepad1.right_stick_x;
+
+        // Denominator is the largest motor power (absolute value) or 1
+        // This ensures all the powers maintain the same ratio, but only when
+        // at least one is out of the range [-1, 1]
+        double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+        double leftFrontPower = (y + x + rx) / denominator;
+        double leftRearPower = (y - x + rx) / denominator;
+        double rightFrontPower = (y - x - rx) / denominator;
+        double rightRearPower = (y + x - rx) / denominator;
+
+        leftFront.setPower(leftFrontPower * speed);
+        leftRear.setPower(leftRearPower * speed);
+        rightFront.setPower(rightFrontPower * speed);
+        rightRear.setPower(rightRearPower * speed);
+
     }
 }

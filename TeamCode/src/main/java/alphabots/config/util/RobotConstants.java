@@ -35,7 +35,7 @@ public class RobotConstants {
     public static double intakeWiperClose = 1; //
 
     // Lift Positions
-    public static int liftToZero = 0;
+    public static int liftToZero = 70;
     public static int liftToHumanPlayer = 0;
     public static int liftToHighChamber = 530;
     public static int liftToHighBucket = 2650;

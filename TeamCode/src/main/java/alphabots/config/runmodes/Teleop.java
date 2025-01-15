@@ -251,6 +251,7 @@ public class Teleop {
                     telemetry.addLine("started 2");
                     setTransferState(2);
                 }
+
                 break;
             case 2:
                 if (transferTimer.getElapsedTimeSeconds() > 0.2) {

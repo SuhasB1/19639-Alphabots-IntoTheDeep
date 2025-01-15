@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.controller.PIDController;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -12,7 +13,7 @@ import alphabots.config.subsystem.IntakeSubsystem;
 import alphabots.config.subsystem.LiftSubsystem;
 import alphabots.config.subsystem.OuttakeSubsystem;
 import alphabots.config.util.RobotConstants;
-
+@Disabled
 @Config
 @TeleOp(name="outtakeTest", group="a")
 public class outtakeTest extends OpMode {

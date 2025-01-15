@@ -154,8 +154,13 @@ public class OuttakeSubsystem {
     public void specimenGrab() {
         setRotateState(RotateState.SPECIMENGRAB);
         setPivotState(PivotState.SPECIMENGRAB);
-        setGrabState(GrabState.OPEN);
         setSpinState(SpinState.FORWARD);
+        if(grabState == GrabState.CLOSED) {
+            setGrabState(GrabState.CLOSED);
+        }
+        if(grabState == GrabState.OPEN) {
+            setGrabState(GrabState.OPEN);
+        }
     }
 
     public void specimenScore() {

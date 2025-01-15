@@ -32,6 +32,7 @@ package alphabots.opmode;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.controller.PIDController;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -41,7 +42,7 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 
 import alphabots.config.util.action.RunAction;
-
+@Disabled
 @Config
 @TeleOp(name="PID_Test_Extend", group="z")
 public class pidTestExtend extends OpMode {

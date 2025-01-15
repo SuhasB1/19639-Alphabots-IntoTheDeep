@@ -2,9 +2,10 @@ package alphabots.opmode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Servo;
-
+@Disabled
 @Config
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "ServoHubDemo", group = "Examples")
 public class ServoHubDemo extends LinearOpMode {

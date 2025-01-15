@@ -1,13 +1,14 @@
 package alphabots.opmode;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 
 import alphabots.config.subsystem.IntakeSubsystem;
 import alphabots.config.util.VariableStorage;
-
+@Disabled
 @Config
 @TeleOp(name="AutoOuttakeTest", group="a")
 public class AutoOuttakeTest extends OpMode {

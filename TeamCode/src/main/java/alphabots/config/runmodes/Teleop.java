@@ -8,10 +8,14 @@ import alphabots.config.subsystem.IntakeSubsystem;
 import alphabots.config.subsystem.LiftSubsystem;
 import alphabots.config.util.RobotConstants;
 import alphabots.config.util.VariableStorage;
+import alphabots.pedroPathing.constants.FConstants;
+import alphabots.pedroPathing.constants.LConstants;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 
+import com.pedropathing.localization.PoseUpdater;
+import com.pedropathing.util.Constants;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -24,11 +28,11 @@ import com.pedropathing.util.Timer;
 import java.util.List;
 
 public class Teleop {
+    private PoseUpdater poseUpdater;
     DcMotor rightFront;
     DcMotor leftFront;
     DcMotor leftRear;
     DcMotor rightRear;
-
 
     private ExtendSubsystem extend;
     private LiftSubsystem lift;
@@ -42,14 +46,10 @@ public class Teleop {
     private OuttakeSubsystem.RotateState outtakeRotateState;
     private OuttakeSubsystem.SpinState outtakeSpinState;
 
-    private Timer transferTimer = new Timer(), wiperTimer = new Timer(), sampleTimer = new Timer(), resetTimer = new Timer();
+    private Timer transferTimer = new Timer(), wiperTimer = new Timer(), sampleTimer = new Timer(), resetTimer = new Timer(), intakeTimer = new Timer(), specimenGrabTimer = new Timer();
 
-    private int transferState = -1, wiperState = -1, sampleState = -1, resetState = -1;
+    private int transferState = -1, wiperState = -1, sampleState = -1, resetState = -1, intakeState = -1, specimenGrabState = -1;
 
-
-
-    private Follower follower;
-    private Pose startPose;
 
     private Telemetry telemetry;
 
@@ -65,7 +65,7 @@ public class Teleop {
     private boolean fieldCentric;
 
 
-    public Teleop(HardwareMap hardwareMap, Telemetry telemetry, Follower follower, Pose startPose, boolean fieldCentric, Gamepad gamepad1, Gamepad gamepad2) {
+    public Teleop(HardwareMap hardwareMap, Telemetry telemetry, boolean fieldCentric, Gamepad gamepad1, Gamepad gamepad2) {
         outtake = new OuttakeSubsystem(hardwareMap, telemetry, outtakeGrabState, outtakeRotateState, outtakePivotState, outtakeSpinState);
         lift = new LiftSubsystem(hardwareMap, telemetry);
         extend = new ExtendSubsystem(hardwareMap, telemetry);
@@ -87,11 +87,6 @@ public class Teleop {
         leftRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightRear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        this.follower = follower;
-        this.startPose = startPose;
-
-        this.startPose = VariableStorage.currentPose;
-
         this.fieldCentric = fieldCentric;
         this.telemetry = telemetry;
         this.gamepad1 = gamepad1;
@@ -99,11 +94,24 @@ public class Teleop {
     }
 
     public void init() {
-        extend.setLimitToSample();
         outtake.init();
-        extend.start();
+        extend.setLimitToSample();
         intake.start();
-        lift.start();
+
+        Constants.setConstants(FConstants.class,LConstants.class);
+
+    }
+
+    public void start(){
+        lift.leftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lift.rightLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        lift.leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        lift.rightLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        extend.extend.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        extend.extend.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        extend.toZero();
     }
 
     public void update() {
@@ -120,13 +128,15 @@ public class Teleop {
             speed = 0.7;
         }
 
-        if (gamepad1.left_trigger > 0.1)
+        if (gamepad1.left_trigger > 0.1) {
             extend.toZero();
+            intake.hover();
+        }
 
-        if (gamepad1.right_bumper)
-            extend.addToTarget(15);
+        if (gamepad1.right_bumper && extend.getTarget() < 1200)
+            extend.addToTarget(40);
         else if (gamepad1.left_bumper)
-            extend.addToTarget(-15);
+            extend.addToTarget(-20);
         else
             extend.addToTarget(0);
 
@@ -142,9 +152,11 @@ public class Teleop {
 
         if (currentGamepad1.square && !previousGamepad1.square)
             intake.transfer();
-
-        if (currentGamepad1.share && !previousGamepad1.share)
+        if (currentGamepad1.share && !previousGamepad1.share){
             extend.extend.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            extend.extend.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            extend.toZero();
+        }
 
 
         //operator
@@ -154,20 +166,25 @@ public class Teleop {
         if (currentGamepad2.right_bumper && !previousGamepad2.right_bumper)
             intake.switchIntakeState();
 
-        if (currentGamepad2.options && !previousGamepad2.options)
+        if (currentGamepad2.share && !previousGamepad2.share)
             intake.switchOuttakeState();
 
-        if (currentGamepad2.circle && !previousGamepad2.circle)
+        if (currentGamepad2.options && !previousGamepad2.options)
             outtake.idle();
 
-        if (currentGamepad2.cross && !previousGamepad2.cross)
+        if (currentGamepad2.cross && !previousGamepad2.cross) {
             startReset();
+        }
 
         if (currentGamepad2.square && !previousGamepad2.square)
             startTransfer();
 
-        if (currentGamepad2.triangle && !previousGamepad2.triangle)
+        if (currentGamepad2.circle && !previousGamepad2.circle)
+            intake.transfer();
+
+        if (currentGamepad2.triangle && !previousGamepad2.triangle){
             startSample();
+        }
 
         if (currentGamepad2.dpad_left && !previousGamepad2.dpad_left)
             specimenGrabPos();
@@ -175,12 +192,17 @@ public class Teleop {
         if (currentGamepad2.dpad_up && !previousGamepad2.dpad_up)
             specimenScorePos();
 
-        if (currentGamepad2.dpad_right && !previousGamepad2.dpad_right)
+        if (currentGamepad2.dpad_right && !previousGamepad2.dpad_right){
             lift.toHighChamber();
+        }
+        if (gamepad2.right_trigger > 0.1) {
+            extend.toQuarter();
+        }
+        if (currentGamepad2.dpad_down && !previousGamepad2.dpad_down)
+            startwiper();
 
         lift.updatePIDF();
         extend.updatePIDF();
-        intake.autoOuttake();
         transfer();
         sample();
         wiper();
@@ -188,11 +210,14 @@ public class Teleop {
         moveDriveTrain();
 
         //follower.update();
+        addTelemetry();
+    }
+
+    public void addTelemetry(){
         extend.telemetry();
         lift.telemetry();
         outtake.telemetry();
         intake.telemetry();
-        telemetry.update();
     }
 
     private void specimenGrabPos() {
@@ -203,12 +228,20 @@ public class Teleop {
         outtake.specimenScore();
     }
 
+    public void setSpecimenGrabState(int x) {
+        specimenGrabState = x;
+        specimenGrabTimer.resetTimer();
+    }
+
+    public void startSpecimenGrab() {
+        setSpecimenGrabState(0);
+    }
+
     private void transfer() {
         switch (transferState) {
             case 0:
                 outtake.idle();
                 outtake.open();
-                intake.transfer();
                 telemetry.addLine("started 1");
                 setTransferState(1);
                 break;
@@ -300,7 +333,6 @@ public class Teleop {
             case 1:
                 if (resetTimer.getElapsedTimeSeconds() > 0.2) {
                     outtake.idle();
-
                     setResetState(2);
                 }
                 break;

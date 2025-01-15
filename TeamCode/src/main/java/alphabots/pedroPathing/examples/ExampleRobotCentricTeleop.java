@@ -5,9 +5,12 @@ import android.provider.SyncStateContract;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.pedropathing.util.Constants;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import  com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import alphabots.config.runmodes.Teleop;
+import alphabots.config.util.FieldConstants;
 import alphabots.pedroPathing.constants.FConstants;
 import alphabots.pedroPathing.constants.LConstants;
 
@@ -17,11 +20,13 @@ import alphabots.pedroPathing.constants.LConstants;
  * @author Baron Henderson - 20077 The Indubitables
  * @version 2.0, 12/30/2024
  */
-
+@Disabled
 @TeleOp(name = "Example Robot-Centric Teleop", group = "Examples")
 public class ExampleRobotCentricTeleop extends OpMode {
     private Follower follower;
-    private final Pose startPose = new Pose(0,0,0);
+    private final Pose startPose = FieldConstants.bucketStartPose;
+    private Teleop teleop;
+
 
     /** This method is call once when init is played, it initializes the follower **/
     @Override
@@ -29,6 +34,7 @@ public class ExampleRobotCentricTeleop extends OpMode {
         Constants.setConstants(FConstants.class,LConstants.class);
         follower = new Follower(hardwareMap);
         follower.setStartingPose(startPose);
+        teleop = new Teleop(hardwareMap, telemetry, false, gamepad1, gamepad2);
     }
 
     /** This method is called continuously after Init while waiting to be started. **/
@@ -52,7 +58,7 @@ public class ExampleRobotCentricTeleop extends OpMode {
         - Turn Left/Right Movement: -gamepad1.right_stick_x
         - Robot-Centric Mode: true
         */
-
+        teleop.update();
         follower.setTeleOpMovementVectors(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, true);
         follower.update();
 
@@ -60,6 +66,7 @@ public class ExampleRobotCentricTeleop extends OpMode {
         telemetry.addData("X", follower.getPose().getX());
         telemetry.addData("Y", follower.getPose().getY());
         telemetry.addData("Heading in Degrees", Math.toDegrees(follower.getPose().getHeading()));
+        teleop.addTelemetry();
 
         /* Update Telemetry to the Driver Hub */
         telemetry.update();

@@ -1,10 +1,11 @@
 package alphabots.opmode;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
-
+@Disabled
 @Config
 @TeleOp(name="ColorTest", group="a")
 public class ColorRangefinderTest extends OpMode {

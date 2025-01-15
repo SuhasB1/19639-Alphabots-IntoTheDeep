@@ -6,7 +6,7 @@ import com.acmerobotics.dashboard.config.Config;
 public class RobotConstants {
 
     // Outtake
-    public static double outtakeGrabClose = 0.5; ///
+    public static double outtakeGrabClose = 0.47; ///
     public static double outtakeGrabOpen = 0.7; ///
     public static double outtakeRotateTransfer = 0.13; ///
     public static double outtakeRotateSpecimenGrab = 0.38; ///
@@ -14,10 +14,10 @@ public class RobotConstants {
     public static double outtakeRotateSpecimenScore = 0.38;
 
     public static double outtakeRotateIdle = 0.15; ///
-    public static double outtakePivotTransfer= 0.58; ///
-    public static double outtakePivotScore = 0.3;
-    public static double outtakePivotSpecimenGrab = 0.05; ///
-    public static double outtakePivotSpecimenScore = 0.2;
+    public static double outtakePivotTransfer= 0.635; ///
+    public static double outtakePivotScore = 0.33;
+    public static double outtakePivotSpecimenGrab = 0.08; ///
+    public static double outtakePivotSpecimenScore = 0.23;
     public static double outtakePivotIdle = 0.43; ///
 
     public static double outtakeSpinForward = 0.73; ///
@@ -35,10 +35,10 @@ public class RobotConstants {
     public static double intakeWiperClose = 1; //
 
     // Lift Positions
-    public static int liftToZero = 70;
+    public static int liftToZero = 0;
     public static int liftToHumanPlayer = 0;
     public static int liftToHighChamber = 530;
-    public static int liftToHighBucket = 2650;
+    public static int liftToHighBucket = 2500;
     public static int liftToLowBucket = 0;
     public static int liftToPark = 415;
 

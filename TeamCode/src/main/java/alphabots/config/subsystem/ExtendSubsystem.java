@@ -17,7 +17,7 @@ public class ExtendSubsystem {
     public int extendLimit = extendFullSample;
     public PIDController extendPID;
     public static int target = 0;
-    public static double p = 0.02, i = 0, d = 0;
+    public static double p = 0.013, i = 0, d = 0;
     public ExtendSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
         this.telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -52,11 +52,11 @@ public class ExtendSubsystem {
     }
 
     public void toQuarter() {
-        setTarget(extendLimit/4);
+        setTarget(75);
     }
 
     public void toHalf() {
-        setTarget(extendLimit/2);
+        setTarget(1000);
     }
 
     public void toFull() {
@@ -101,5 +101,6 @@ public class ExtendSubsystem {
 
     public void telemetry() {
         telemetry.addData("Extend Pos: ", getPos());
+        telemetry.addData("extend targer:", getTarget());
     }
 }

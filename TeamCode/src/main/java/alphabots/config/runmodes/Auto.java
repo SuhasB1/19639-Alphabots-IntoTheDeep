@@ -2,6 +2,7 @@ package alphabots.config.runmodes;
 
 import static alphabots.config.util.FieldConstants.*;
 
+import com.pedropathing.util.Constants;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import com.pedropathing.pathgen.BezierCurve;
@@ -11,6 +12,9 @@ import alphabots.config.subsystem.IntakeSubsystem;
 import alphabots.config.subsystem.LiftSubsystem;
 import alphabots.config.subsystem.DriveSubsystem;
 import alphabots.config.util.RobotConstants;
+import alphabots.config.util.VariableStorage;
+import alphabots.pedroPathing.constants.FConstants;
+import alphabots.pedroPathing.constants.LConstants;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
@@ -21,8 +25,6 @@ import com.pedropathing.pathgen.Point;
 import com.pedropathing.util.Timer;
 
 public class Auto {
-
-    private RobotStart startLocation;
 
     public IntakeSubsystem intake;
     private IntakeSubsystem.IntakeState intakeBoxState;
@@ -38,7 +40,6 @@ public class Auto {
     public ExtendSubsystem extend;
 
 
-    public Follower follower;
     public Telemetry telemetry;
 
     public boolean actionBusy;
@@ -46,188 +47,39 @@ public class Auto {
     public Timer transferTimer = new Timer(), bucketTimer = new Timer(), chamberScoreTimer = new Timer(), intakeTimer = new Timer(), parkTimer = new Timer(), specimenTimer = new Timer();
     public int transferState = -1, bucketState = -1, chamberScoreState = -1, intakeState = -1, parkState = -1, specimenState = -1;
 
-    public Path element1, score1, element2, score2, element3, score3;
-    public PathChain pushSamples, preload,specimen1, specimen2, specimen3, specimen4, grab1, grab2, grab3, grab4, park;
-    public Pose startPose, preloadPose, sample1Pose, sample1ControlPose, sample2Pose, sample2ControlPose, sample3Pose, sample3ControlPose, sampleScorePose, parkControlPose, parkPose, grab1Pose, specimen1Pose, grab2Pose, specimen2Pose, grab3Pose, specimen3Pose, grab4Pose, specimen4Pose, specimenSetPose;
-
-    public Auto(HardwareMap hardwareMap, Telemetry telemetry, Follower follower, boolean isBlue, boolean isBucket) {
+    public Auto(HardwareMap hardwareMap, Telemetry telemetry) {
         outtake = new OuttakeSubsystem(hardwareMap, telemetry, outtakeGrabState, outtakeRotateState, outtakePivotState, outtakeSpinState);
         lift = new LiftSubsystem(hardwareMap, telemetry);
         extend = new ExtendSubsystem(hardwareMap, telemetry);
         intake = new IntakeSubsystem(hardwareMap, telemetry, intakeBoxState, intakePivotState);
 
-        this.follower = follower;
         this.telemetry = telemetry;
-
-        startLocation = isBucket ? RobotStart.BUCKET : RobotStart.OBSERVATION;
-
-        createPoses();
-        buildPaths();
 
         init();
     }
 
     public void init() {
         telemetryUpdate();
-
-        follower.setStartingPose(startPose);
+        outtake.init();
+        intake.start();
     }
 
     public void start() {
-        follower.setStartingPose(startPose);
+
+    }
+
+    public void stop(){
+        VariableStorage.extendPos = extend.getPos();
+        VariableStorage.liftPos = lift.getPos();
     }
 
     public void update() {
-        follower.update();
+        transfer();
+        pick();
+        bucket();
+        lift.updatePIDF();
+        extend.updatePIDF();
         telemetryUpdate();
-    }
-
-    public void createPoses() { //Able to be cut
-        switch (startLocation) {
-            case BUCKET:
-                startPose = bucketStartPose;
-                preloadPose = bucketPreloadPose;
-                sample1ControlPose = bucketLeftSampleControlPose;
-                sample1Pose = bucketLeftSamplePose;
-                sample2ControlPose = bucketMidSampleControlPose;
-                sample2Pose = bucketMidSamplePose;
-                sample3ControlPose = bucketRightSampleControlPose;
-                sample3Pose = bucketRightSamplePose;
-                sampleScorePose = bucketScorePose;
-                parkControlPose = bucketParkControlPose;
-                parkPose = bucketParkPose;
-                break;
-
-            case OBSERVATION:
-                startPose = observationStartPose;
-                preloadPose = observationPreloadPose;
-                specimenSetPose = observationSpecimenSetPose;
-                grab1Pose = observationSpecimenPickupPose;
-                grab2Pose = observationSpecimenPickup2Pose;
-                grab3Pose = observationSpecimenPickup3Pose;
-                grab4Pose = observationSpecimenPickup4Pose;
-                specimen1Pose = observationSpecimen1Pose;
-                specimen2Pose = observationSpecimen2Pose;
-                specimen3Pose = observationSpecimen3Pose;
-                specimen4Pose = observationSpecimen4Pose;
-                parkPose = observationParkPose;
-                break;
-        }
-
-        follower.setStartingPose(startPose);
-    }
-
-    public void buildPaths() {
-        if(startLocation == RobotStart.BUCKET) {
-            preload = follower.pathBuilder()
-                    .addPath(new BezierLine(new Point(startPose), new Point(preloadPose)))
-                    .setLinearHeadingInterpolation(startPose.getHeading(), preloadPose.getHeading())
-                    .build();
-
-            element1 = new Path(new BezierCurve(new Point(preloadPose), new Point(sample1ControlPose), new Point(sample1Pose)));
-            element1.setLinearHeadingInterpolation(preloadPose.getHeading(), sample1Pose.getHeading());
-
-            score1 = new Path(new BezierLine(new Point(sample1Pose), new Point(sampleScorePose)));
-            score1.setLinearHeadingInterpolation(sample1Pose.getHeading(), sampleScorePose.getHeading());
-
-            element2 = new Path(new BezierCurve(new Point(sampleScorePose), new Point(sample2ControlPose), new Point(sample2Pose)));
-            element2.setLinearHeadingInterpolation(sampleScorePose.getHeading(), sample2Pose.getHeading());
-
-            score2 = new Path(new BezierLine(new Point(sample2Pose), new Point(sampleScorePose)));
-            score2.setLinearHeadingInterpolation(sample2Pose.getHeading(), sampleScorePose.getHeading());
-
-            element3 = new Path(new BezierCurve(new Point(sampleScorePose), new Point(sample3ControlPose), new Point(sample3Pose)));
-            element3.setLinearHeadingInterpolation(sampleScorePose.getHeading(), sample3Pose.getHeading());
-
-            score3 = new Path(new BezierLine(new Point(sample3Pose), new Point(sampleScorePose)));
-            score3.setLinearHeadingInterpolation(sample3Pose.getHeading(), sampleScorePose.getHeading());
-
-            park = follower.pathBuilder()
-                    .addPath(new BezierCurve(new Point(sampleScorePose), new Point(parkControlPose), new Point(parkPose)))
-                    .setLinearHeadingInterpolation(sampleScorePose.getHeading(), parkPose.getHeading())
-                    .build();
-        }
-
-        if (startLocation == RobotStart.OBSERVATION) {
-            preload = follower.pathBuilder()
-                    .addPath(new BezierLine(new Point(startPose), new Point(preloadPose)))
-                    .setLinearHeadingInterpolation(startPose.getHeading(), preloadPose.getHeading())
-                    .setZeroPowerAccelerationMultiplier(4)
-                    .build();
-
-            pushSamples = follower.pathBuilder()
-                    .addPath(new BezierCurve(new Point(preloadPose), new Point(15, 36, Point.CARTESIAN), new Point(61, 36.25, Point.CARTESIAN), new Point(59, 26.000, Point.CARTESIAN)))
-                    .setLinearHeadingInterpolation(preloadPose.getHeading(), Math.toRadians(180))
-                    .addPath(new BezierLine(new Point(59.000, 26.000, Point.CARTESIAN), new Point(28, 26.000, Point.CARTESIAN)))
-                    .setLinearHeadingInterpolation(Math.toRadians(180),Math.toRadians(180))
-                    .addPath(new BezierCurve(new Point(28, 26.000, Point.CARTESIAN), new Point(52.000, 30.000, Point.CARTESIAN), new Point(58.000, 16.000, Point.CARTESIAN)))
-                    .setLinearHeadingInterpolation(Math.toRadians(180),Math.toRadians(180))
-                    .addPath(new BezierLine(new Point(58.000, 16.000, Point.CARTESIAN),new Point(28, 16.000, Point.CARTESIAN)))
-                    .setLinearHeadingInterpolation(Math.toRadians(180),Math.toRadians(180))
-                    .addPath(new BezierCurve(new Point(28, 16.000, Point.CARTESIAN), new Point(56.000, 16.000, Point.CARTESIAN), new Point(56.000, 10, Point.CARTESIAN)))
-                    .setLinearHeadingInterpolation(Math.toRadians(180),Math.toRadians(180))
-                    .addPath(new BezierLine(new Point(56.000, 10, Point.CARTESIAN), new Point(28, 10, Point.CARTESIAN)))
-                    .setLinearHeadingInterpolation(Math.toRadians(180),Math.toRadians(180))
-                    .addPath(new BezierLine(new Point(28, 10, Point.CARTESIAN), new Point(specimenSetPose)))
-                    .setLinearHeadingInterpolation(Math.toRadians(180), specimenSetPose.getHeading())
-                    //.setZeroPowerAccelerationMultiplier(0.5)
-                    .build();
-
-            grab1 = follower.pathBuilder()
-                    .addPath(new BezierLine(new Point(specimenSetPose), new Point(grab1Pose)))
-                    .setLinearHeadingInterpolation(specimenSetPose.getHeading(), grab1Pose.getHeading())
-                    .setZeroPowerAccelerationMultiplier(1)
-                    .build();
-
-            specimen1 = follower.pathBuilder()
-                    .addPath(new BezierCurve(new Point(grab1Pose), new Point(specimen1Pose.getX()-10, specimen1Pose.getY(), Point.CARTESIAN), new Point(specimen1Pose)))
-                    .setLinearHeadingInterpolation(grab1Pose.getHeading(), specimen1Pose.getHeading())
-                    .setZeroPowerAccelerationMultiplier(1)
-                    .build();
-
-            grab2 = follower.pathBuilder()
-                    .addPath(new BezierLine(new Point(specimen1Pose), new Point(grab2Pose)))
-                    .setLinearHeadingInterpolation(specimen1Pose.getHeading(), grab2Pose.getHeading())
-                    .setZeroPowerAccelerationMultiplier(1)
-                    .build();
-
-            specimen2 = follower.pathBuilder()
-                    .addPath(new BezierCurve(new Point(grab2Pose), new Point(specimen2Pose.getX() - 10, specimen2Pose.getY(), Point.CARTESIAN),new Point(specimen2Pose)))
-                    .setLinearHeadingInterpolation(grab2Pose.getHeading(), specimen2Pose.getHeading())
-                    .setZeroPowerAccelerationMultiplier(1)
-                    .build();
-
-            grab3 = follower.pathBuilder()
-                    .addPath(new BezierLine(new Point(specimen2Pose), new Point(grab3Pose)))
-                    .setLinearHeadingInterpolation(specimen2Pose.getHeading(), grab3Pose.getHeading())
-                    .setZeroPowerAccelerationMultiplier(1)
-                    .build();
-
-            specimen3 = follower.pathBuilder()
-                    .addPath(new BezierCurve(new Point(grab3Pose), new Point(specimen3Pose.getX() - 10, specimen3Pose.getY(), Point.CARTESIAN),new Point(specimen3Pose)))
-                    .setLinearHeadingInterpolation(grab3Pose.getHeading(), specimen3Pose.getHeading())
-                    .setZeroPowerAccelerationMultiplier(1)
-                    .build();
-
-            grab4 = follower.pathBuilder()
-                    .addPath(new BezierLine(new Point(specimen3Pose), new Point(grab4Pose)))
-                    .setLinearHeadingInterpolation(specimen3Pose.getHeading(), grab4Pose.getHeading())
-                    .setZeroPowerAccelerationMultiplier(1)
-                    .build();
-
-            specimen4 = follower.pathBuilder()
-                    .addPath(new BezierCurve(new Point(grab4Pose), new Point(specimen4Pose.getX() - 10, specimen3Pose.getY(), Point.CARTESIAN),new Point(specimen3Pose)))
-                    .setLinearHeadingInterpolation(grab4Pose.getHeading(), specimen4Pose.getHeading())
-                    .setZeroPowerAccelerationMultiplier(1)
-                    .build();
-
-            park = follower.pathBuilder()
-                    .addPath(new BezierLine(new Point(specimen4Pose), new Point(parkPose)))
-                    .setLinearHeadingInterpolation(specimen4Pose.getHeading(), parkPose.getHeading())
-                    .setZeroPowerAccelerationMultiplier(3)
-                    .build();      
-
-        }
     }
 
     public void transfer() {
@@ -254,6 +106,11 @@ public class Auto {
             case 3:
                 if (transferTimer.getElapsedTimeSeconds() > 0.2) {
                     outtake.close();
+                    transferTimer.resetTimer();
+                    setTransferState(4);
+                }
+            case 4:
+                if (transferTimer.getElapsedTimeSeconds() > 0.35) {
                     transferTimer.resetTimer();
                     actionBusy = false;
                     setTransferState(-1);
@@ -283,7 +140,9 @@ public class Auto {
                 setBucketState(2);
                 break;
             case 2:
-                if (lift.getPos() > RobotConstants.liftToHighBucket - 150) {
+                if (lift.getPos() > RobotConstants.liftToHighBucket - 300) {
+                    intake.ground();
+                    intake.intake();
                     outtake.score();
                     outtake.close();
                     bucketTimer.resetTimer();
@@ -291,13 +150,18 @@ public class Auto {
                 }
                 break;
             case 3:
-                if (bucketTimer.getElapsedTimeSeconds() > 0.18) {
+                if (lift.getPos() > RobotConstants.liftToHighBucket - 30) {
+                    bucketTimer.resetTimer();
+                    setBucketState(35);
+                }
+            case 35:
+                if (bucketTimer.getElapsedTimeSeconds() > 0.2 ) {
                     outtake.open();
                     bucketTimer.resetTimer();
                     setBucketState(4);
                 }
             case 4:
-                if (bucketTimer.getElapsedTimeSeconds() > 0.2) {
+                if (bucketTimer.getElapsedTimeSeconds() > 0.2 ) {
                     outtake.idle();
                     bucketTimer.resetTimer();
                     setBucketState(5);
@@ -325,7 +189,7 @@ public class Auto {
             setBucketState(1);
         }
     }
-
+/*
     public void chamberScore() {
         switch (chamberScoreState) {
             case 1:
@@ -391,37 +255,51 @@ public class Auto {
             setSpecimenState(1);
         }
     }
+    */
 
-    public void intake() {
+    public void pick() {
         switch (intakeState) {
             case 1:
                 actionBusy = true;
-                outtake.idle();
                 intake.intake();
                 intake.ground();
-                extend.toHalf();
                 intakeTimer.resetTimer();
-                setTransferState(2);
+                setIntakeState(2);
                 break;
             case 2:
-                if(intakeTimer.getElapsedTimeSeconds() > 0.5 && (RobotConstants.extendFullSample/2) - extend.getPos() < 15) {
+                if(intakeTimer.getElapsedTimeSeconds() > 0) {
+                    extend.setTarget(700);
                     intakeTimer.resetTimer();
-                    setTransferState(3);
+                    setIntakeState(10);
+                }
+                break;
+            case 10:
+                if(700 - extend.getPos() < 30) {
+                    intakeTimer.resetTimer();
+                    setIntakeState(11);
+                }
+                break;
+            case 11:
+                if(intakeTimer.getElapsedTimeSeconds() > 0.2) {
+                    extend.addToTarget(450);
+                    intakeTimer.resetTimer();
+                    setIntakeState(3);
                 }
                 break;
             case 3:
-                if (intakeTimer.getElapsedTimeSeconds() > 1) {
+                if (intakeTimer.getElapsedTimeSeconds() > 0.8) {
                     intake.idle();
-                    intake.transfer();
+                    intake.intake();
                     extend.toZero();
+                    intake.transfer();
                     intakeTimer.resetTimer();
-                    setTransferState(4);
+                    setIntakeState(4);
                 }
                 break;
             case 4:
-                if (intakeTimer.getElapsedTimeSeconds() > 0.7 && extend.getPos() < 15) {
+                if (intakeTimer.getElapsedTimeSeconds() > 0.4 && extend.getPos() < 15) {
                     actionBusy = false;
-                    setTransferState(-1);
+                    setIntakeState(-1);
                 }
                 break;
         }
@@ -472,15 +350,7 @@ public class Auto {
         return !actionBusy;
     }
 
-    public boolean notBusy() {
-        return (!follower.isBusy() && actionNotBusy());
-    }
-
     public void telemetryUpdate() {
-        follower.update();
-        telemetry.addData("X: ", follower.getPose().getX());
-        telemetry.addData("Y: ", follower.getPose().getY());
-        telemetry.addData("Heading: ", Math.toDegrees(follower.getPose().getHeading()));
         telemetry.addData("Action Busy?: ", actionBusy);
         extend.telemetry();
         lift.telemetry();
@@ -488,4 +358,5 @@ public class Auto {
         intake.telemetry();
         telemetry.update();
     }
+
 }

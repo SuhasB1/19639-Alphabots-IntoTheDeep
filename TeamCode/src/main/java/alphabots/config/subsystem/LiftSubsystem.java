@@ -5,6 +5,7 @@ import static alphabots.config.util.RobotConstants.*;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.controller.PIDController;
+import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -14,7 +15,6 @@ import alphabots.config.util.action.RunAction;
 
 public class LiftSubsystem {
     private Telemetry telemetry;
-
     public DcMotor rightLift, leftLift;
     public boolean hang = false;
     public int pos, bottom;
@@ -44,24 +44,30 @@ public class LiftSubsystem {
     }
 
     public void updatePIDF(){
+            if (getTarget() == liftToZero && getPos() < 60) {
+                leftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                rightLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-            liftPID.setPID(p,i,d);
-            
-            rightLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            leftLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                rightLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                leftLift.setPower(0);
+                rightLift.setPower(0);
+            }else {
+                liftPID.setPID(p, i, d);
 
-            double pid = liftPID.calculate(getPos(), target);
-            double ticks_in_degrees = 537.7 / 360.0;
-            double ff = Math.cos(Math.toRadians(target / ticks_in_degrees)) * f;
-            double power = pid + ff;
-            if (target == liftToZero) {
-                if (power<= -0.75){
-                    power = -0.75;
-                }
+                rightLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+                leftLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
+                double pid = liftPID.calculate(getPos(), target);
+                double ticks_in_degrees = 537.7 / 360.0;
+                double ff = Math.cos(Math.toRadians(target / ticks_in_degrees)) * f;
+                double power = pid + ff;
+                rightLift.setPower(power);
+                leftLift.setPower(power);
             }
-            rightLift.setPower(power);
-            leftLift.setPower(power);
     }
+
+
 
     //Util
     public void targetCurrent() {

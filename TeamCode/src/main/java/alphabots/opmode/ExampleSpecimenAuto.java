@@ -26,7 +26,7 @@ public class ExampleSpecimenAuto extends OpMode {
 
     private final Pose startPose = new Pose(7.297, 52.888, Math.toRadians(0));
     private final Pose controlPose1 = new Pose(10.000, 80.000, Math.toRadians(180));
-    private final Pose scorePreloadPose = new Pose(40.823, 64.327, Math.toRadians(180));
+    private final Pose scorePreloadPose = new Pose(40.80346213691068, 66.75072702235357, Math.toRadians(180));
     private final Pose controlPose2 = new Pose(27.000, 20.000, Math.toRadians(0));
     private final Pose pushPose1 = new Pose(64.489, 32.576, Math.toRadians(0));
     private final Pose controlPose3 = new Pose(80.000, 20.000, Math.toRadians(0));

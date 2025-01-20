@@ -24,17 +24,17 @@ public class ExampleSpecimenAuto extends OpMode {
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState;
 
-    private final Pose startPose = new Pose(7.297, 52.888, Math.toRadians(0));
+    private final Pose startPose = new Pose(7.297, 52.888, Math.toRadians(180));
     private final Pose controlPose1 = new Pose(10.000, 80.000, Math.toRadians(180));
-    private final Pose scorePreloadPose = new Pose(40.80346213691068, 66.75072702235357, Math.toRadians(180));
-    private final Pose controlPose2 = new Pose(27.000, 20.000, Math.toRadians(0));
-    private final Pose pushPose1 = new Pose(64.489, 32.576, Math.toRadians(0));
+    private final Pose scorePreloadPose = new Pose(30.80346213691068, 66.75072702235357, Math.toRadians(180));
+    private final Pose controlPose2 = new Pose(27.000, 25.000, Math.toRadians(0));
+    private final Pose pushPose1 = new Pose(75.489, 17.576, Math.toRadians(0));
     private final Pose controlPose3 = new Pose(80.000, 20.000, Math.toRadians(0));
-    private final Pose intakePose = new Pose(14.397, 21.137, Math.toRadians(0));
-    private final Pose controlPose4 = new Pose(15.000, 80.000, Math.toRadians(0));
-    private final Pose controlPose5 = new Pose(40.000, 30.000, Math.toRadians(0));
-    private final Pose controlPose6 = new Pose(130.000, 0.000, Math.toRadians(0));
-    private final Pose controlPose7 = new Pose(50.000, 0.000, Math.toRadians(0));
+    private final Pose intakePose = new Pose(16.397, 17.137, Math.toRadians(0));
+    private final Pose controlPose4 = new Pose(15.000, 40.000, Math.toRadians(0));
+    private final Pose controlPose5 = new Pose(40.000, 15.000, Math.toRadians(0));
+    private final Pose controlPose6 = new Pose(130.000, 10.000, Math.toRadians(0));
+    private final Pose controlPose7 = new Pose(50.000, 10.000, Math.toRadians(0));
     private final Pose pushPose3 = new Pose(78.885, 4.374, Math.toRadians(0));
     private final Pose pushedPose3 = new Pose(16.764, 4.374, Math.toRadians(0));
 
@@ -78,17 +78,16 @@ public class ExampleSpecimenAuto extends OpMode {
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0:
-                auto.outtake.specimenScore();
-                auto.lift.toHighChamber();
+                auto.startChamberScore();
                 follower.setMaxPower(0.8);
-                follower.followPath(scorePreload);
+                follower.followPath(scorePreload, true);
                 setPathState(50);
                 break;
             case 50:
                 if(!follower.isBusy() && auto.actionNotBusy()) {
                     auto.outtake.open();
-                    auto.lift.toZero();
                     auto.outtake.idle();
+                    auto.lift.toZero();
                     setPathState(1);
                 }
                 break;
@@ -103,7 +102,7 @@ public class ExampleSpecimenAuto extends OpMode {
                 }
                 break;
             case 2:
-                follower.setMaxPower(0.6);
+                follower.setMaxPower(0.8);
                 follower.followPath(pushSpecimen1);
                 setPathState(200);
                 break;
@@ -113,7 +112,7 @@ public class ExampleSpecimenAuto extends OpMode {
                 }
                 break;
             case 3:
-                follower.setMaxPower(0.6);
+                follower.setMaxPower(0.8);
                 follower.followPath(pushSpecimen2);
                 setPathState(250);
                 break;
@@ -123,7 +122,7 @@ public class ExampleSpecimenAuto extends OpMode {
                 }
                 break;
             case 4:
-                follower.setMaxPower(0.6);
+                follower.setMaxPower(0.8);
                 follower.followPath(prePushSpecimen3);
                 setPathState(300);
                 break;
@@ -133,12 +132,13 @@ public class ExampleSpecimenAuto extends OpMode {
                 }
                 break;
             case 5:
-                follower.setMaxPower(0.6);
+                follower.setMaxPower(0.8);
                 follower.followPath(pushSpecimen3);
                 setPathState(350);
                 break;
             case 350:
                 if(!follower.isBusy() && auto.actionNotBusy()) {
+                    auto.startSpecimen();
                     setPathState(6);
                 }
                 break;
@@ -183,6 +183,7 @@ public class ExampleSpecimenAuto extends OpMode {
         follower = new Follower(hardwareMap);
         follower.setStartingPose(startPose);
         auto = new Auto(hardwareMap, telemetry);
+        auto.startTransfer();
         buildPaths();
     }
 

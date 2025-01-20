@@ -202,25 +202,31 @@ public class Auto {
                 lift.toZero();
                 outtake.idle();
                 outtake.open();
-                setSpecimenState(1);
                 specimenTimer.resetTimer();
                 setSpecimenState(2);
                 break;
             case 2:
-                if (specimenTimer.getElapsedTimeSeconds() > 0.2 && extend.getPos() < 30 && lift.getPos() < 30) {
+                if (specimenTimer.getElapsedTimeSeconds() > 0.2 && lift.getPos() < 30) {
                     outtake.specimenGrab();
                     specimenTimer.resetTimer();
                     setSpecimenState(3);
                 }
                 break;
             case 3:
-                if (specimenTimer.getElapsedTimeSeconds() > 0.4) {
+                if (specimenTimer.getElapsedTimeSeconds() > 0.1) {
                     outtake.close();
-                    outtake.specimenScore();
                     specimenTimer.resetTimer();
                     setSpecimenState(4);
                 }
+                break;
             case 4:
+                if (specimenTimer.getElapsedTimeSeconds() > 0.4) {
+                    outtake.specimenScore();
+                    specimenTimer.resetTimer();
+                    setSpecimenState(5);
+                }
+                break;
+            case 5:
                 if (specimenTimer.getElapsedTimeSeconds() > 0.2) {
                     specimenTimer.resetTimer();
                     actionBusy = false;
@@ -229,6 +235,16 @@ public class Auto {
                 break;
         }
     }
+
+    public void resetSpecimen() {
+        actionBusy = true;
+        outtake.open();
+        lift.toZero();
+        specimenTimer.resetTimer();
+        setSpecimenState(1);
+        actionBusy = false;
+    }
+
 
     public void setSpecimenState(int x) {
         specimenState = x;
@@ -246,7 +262,6 @@ public class Auto {
                 actionBusy = true;
                 outtake.close();
                 outtake.specimenScore();
-                setChamberScoreState(1);
                 chamberScoreTimer.resetTimer();
                 setChamberScoreState(2);
                 break;

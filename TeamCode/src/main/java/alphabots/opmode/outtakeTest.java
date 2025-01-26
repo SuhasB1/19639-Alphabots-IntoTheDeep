@@ -13,7 +13,7 @@ import alphabots.config.subsystem.IntakeSubsystem;
 import alphabots.config.subsystem.LiftSubsystem;
 import alphabots.config.subsystem.OuttakeSubsystem;
 import alphabots.config.util.RobotConstants;
-@Disabled
+
 @Config
 @TeleOp(name="outtakeTest", group="a")
 public class outtakeTest extends OpMode {
@@ -33,7 +33,7 @@ public class outtakeTest extends OpMode {
     public static int posLeft, posRight;
     public PIDController liftPID;
 
-    public static double p = 0.013, i = 0, d = 0.0002;
+    public static double p = 0.0, i = 0, d = 0.000;
     public static double f = 0.01;
 
     @Override
@@ -59,7 +59,6 @@ public class outtakeTest extends OpMode {
 
     @Override
     public void start() {
-        intake.start();
     }
 
     @Override

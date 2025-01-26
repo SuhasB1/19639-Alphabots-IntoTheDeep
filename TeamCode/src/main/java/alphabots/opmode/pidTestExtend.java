@@ -50,7 +50,7 @@ public class pidTestExtend extends OpMode {
     public static int pos;
     public PIDController liftPID;
     public static int target;
-    public static double p = 0.03, i = 0, d = 0;
+    public static double p = 0.0, i = 0, d = 0;
     private Gamepad currentGamepad2 = new Gamepad(), previousGamepad2 = new Gamepad();
 
     @Override

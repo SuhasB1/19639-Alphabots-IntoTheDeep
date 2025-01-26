@@ -77,6 +77,8 @@ public class Auto {
         transfer();
         pick();
         bucket();
+        specimen();
+        chamberScore();
         lift.updatePIDF();
         extend.updatePIDF();
         telemetryUpdate();
@@ -122,6 +124,8 @@ public class Auto {
     public void setTransferState(int x) {
         transferState = x;
     }
+
+
 
     public void startTransfer() {
         if (actionNotBusy()) {
@@ -189,6 +193,106 @@ public class Auto {
             setBucketState(1);
         }
     }
+
+
+    public void specimen() {
+        switch (specimenState) {
+            case 1:
+                actionBusy = true;
+                lift.toZero();
+                outtake.idle();
+                outtake.open();
+                specimenTimer.resetTimer();
+                setSpecimenState(2);
+                break;
+            case 2:
+                if (specimenTimer.getElapsedTimeSeconds() > 0.2 && lift.getPos() < 30) {
+                    outtake.specimenGrab();
+                    specimenTimer.resetTimer();
+                    setSpecimenState(3);
+                }
+                break;
+            case 3:
+                if (specimenTimer.getElapsedTimeSeconds() > 0.1) {
+                    outtake.close();
+                    specimenTimer.resetTimer();
+                    setSpecimenState(4);
+                }
+                break;
+            case 4:
+                if (specimenTimer.getElapsedTimeSeconds() > 0.4) {
+                    outtake.specimenScore();
+                    specimenTimer.resetTimer();
+                    setSpecimenState(5);
+                }
+                break;
+            case 5:
+                if (specimenTimer.getElapsedTimeSeconds() > 0.2) {
+                    specimenTimer.resetTimer();
+                    actionBusy = false;
+                    setSpecimenState(-1);
+                }
+                break;
+        }
+    }
+
+    public void resetSpecimen() {
+        actionBusy = true;
+        outtake.open();
+        lift.toZero();
+        specimenTimer.resetTimer();
+        setSpecimenState(1);
+        actionBusy = false;
+    }
+
+
+    public void setSpecimenState(int x) {
+        specimenState = x;
+    }
+
+    public void startSpecimen() {
+        if (actionNotBusy()) {
+            setSpecimenState(1);
+        }
+    }
+
+    public void chamberScore() {
+        switch (chamberScoreState) {
+            case 1:
+                actionBusy = true;
+                outtake.close();
+                outtake.specimenScore();
+                chamberScoreTimer.resetTimer();
+                setChamberScoreState(2);
+                break;
+            case 2:
+                if (chamberScoreTimer.getElapsedTimeSeconds() > 0.3 && extend.getPos() < 30 && lift.getPos() < 30) {
+                    lift.toHighChamber();
+                    chamberScoreTimer.resetTimer();
+                    setChamberScoreState(3);
+                }
+                break;
+            case 3:
+                if (chamberScoreTimer.getElapsedTimeSeconds() > 0.2) {
+                    outtake.specimenScore();
+                    chamberScoreTimer.resetTimer();
+                    actionBusy = false;
+                    setChamberScoreState(-1);
+                }
+                break;
+        }
+    }
+
+    public void setChamberScoreState(int x) {
+        chamberScoreState = x;
+    }
+    public void startChamberScore() {
+        if (actionNotBusy()) {
+            setChamberScoreState(1);
+        }
+    }
+
+
 /*
     public void chamberScore() {
         switch (chamberScoreState) {
@@ -330,7 +434,7 @@ public class Auto {
                 if(parkTimer.getElapsedTimeSeconds() > 0.3) {
                     lift.toPark();
                     actionBusy = false;
-                    setTransferState(-1);
+                    setParkState(-1);
                 }
                 break;
         }

@@ -71,7 +71,7 @@ public class ExampleSpecimenAuto extends OpMode {
                 .setLinearHeadingInterpolation(pushPose3.getHeading(), pushedPose3.getHeading())
                 .build();
         park = new Path(new BezierLine(new Point(pushedPose3), new Point(intakePose)));
-        park.setLinearHeadingInterpolation(pushedPose3.getHeading(), intakePose.getHeading());
+        park.setLinearHeadingInterpolation(pushedPose3.getHeading(), intakePose.getHeading());               
 
     }
 

@@ -10,8 +10,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 @Config
 @TeleOp(name="outtake servo shi", group="a")
 public class OuttakeServoSetting extends OpMode {
-    Servo rightPivot;
-    Servo leftPivot;
+    Servo outtakeRightPivot;
+    Servo outtakeLeftPivot;
     Servo outtakeRotate;
     Servo outtakeSpin;
     Servo outtakeGrip;
@@ -24,19 +24,19 @@ public class OuttakeServoSetting extends OpMode {
     public static double servoPosition = 1;
     public static double outtakeRotatePos = 1;
     public static double outtakeSpinPos = 1;
-    public static double outtakeGripPos = 1;
+    public static double outtakeGripPos = 0.5;
     @Override
     public void init() {
-        rightPivot = hardwareMap.get(Servo.class, "oRP");
-        leftPivot = hardwareMap.get(Servo.class, "oLP");
+        outtakeRightPivot = hardwareMap.get(Servo.class, "oRP");
+        outtakeLeftPivot = hardwareMap.get(Servo.class, "oLP");
         outtakeRotate = hardwareMap.get(Servo.class, "oR");
         outtakeSpin = hardwareMap.get(Servo.class, "oS");
         outtakeGrip = hardwareMap.get(Servo.class, "oG");
-        leftPivot.setDirection(Servo.Direction.REVERSE);
+        outtakeLeftPivot.setDirection(Servo.Direction.REVERSE);
 
         // Set initial position
-        rightPivot.setPosition(servoPosition);
-        leftPivot.setPosition(servoPosition);
+        outtakeRightPivot.setPosition(servoPosition);
+        outtakeLeftPivot.setPosition(servoPosition);
         outtakeRotate.setPosition(outtakeRotatePos);
         outtakeGrip.setPosition(outtakeGripPos);
         outtakeSpin.setPosition(outtakeSpinPos);
@@ -44,17 +44,21 @@ public class OuttakeServoSetting extends OpMode {
 
     @Override
     public void loop() {
-        // Clamp servo position to valid range
         servoPosition = Math.max(minPosition, Math.min(maxPosition, servoPosition));
+        outtakeRotatePos = Math.max(minPosition, Math.min(maxPosition, outtakeRotatePos));
+        outtakeSpinPos = Math.max(minPosition, Math.min(maxPosition, outtakeSpinPos));
+        outtakeGripPos = Math.max(minPosition, Math.min(maxPosition, outtakeGripPos));
 
-        // Apply updated servo position
-        rightPivot.setPosition(servoPosition);
-        leftPivot.setPosition(servoPosition);
+        outtakeRightPivot.setPosition(servoPosition);
+        outtakeLeftPivot.setPosition(servoPosition);
         outtakeRotate.setPosition(outtakeRotatePos);
-        outtakeGrip.setPosition(outtakeGripPos);
         outtakeSpin.setPosition(outtakeSpinPos);
+        outtakeGrip.setPosition(outtakeGripPos);
 
         telemetry.addData("Servo Position", servoPosition);
+        telemetry.addData("Outtake Rotate Position", outtakeRotatePos);
+        telemetry.addData("Outtake Spin Position", outtakeSpinPos);
+        telemetry.addData("Outtake Grip Position", outtakeGripPos);
         telemetry.update();
     }
 }

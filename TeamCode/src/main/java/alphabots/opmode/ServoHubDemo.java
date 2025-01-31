@@ -9,39 +9,53 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 
 @Config
-@TeleOp(name="servo hubt", group="a")
+@TeleOp(name="IntakeTweaker", group="a")
 public class ServoHubDemo extends OpMode {
     Servo rightPivot;
     Servo leftPivot;
+    Servo outtakeRightPivot;
+    Servo outtakeLeftPivot;
+    Servo outtakeRotate;
+    Servo outtakeSpin;
+    Servo outtakeGrip;
 
-    public static double servoIncrement = 0.001;
-    public static double minPosition = 0.0;
-    public static double maxPosition = 1.0;
 
-    // Make servoPosition static and configurable through FTC Dashboard
-    public static double servoPosition = 1;
+    public static double iP = 1;
+    public static double oP = 1;
+    public static double oR = 1;
+    public static double oS = 1;
+    public static double oG = 1;
 
     @Override
     public void init() {
         rightPivot = hardwareMap.get(Servo.class, "iRP");
         leftPivot = hardwareMap.get(Servo.class, "iLP");
+        outtakeRightPivot = hardwareMap.get(Servo.class, "oRP");
+        outtakeLeftPivot = hardwareMap.get(Servo.class, "oLP");
+        outtakeRotate = hardwareMap.get(Servo.class, "oR");
+        outtakeSpin = hardwareMap.get(Servo.class, "oS");
+        outtakeGrip = hardwareMap.get(Servo.class, "oG");
+        outtakeLeftPivot.setDirection(Servo.Direction.REVERSE);
         leftPivot.setDirection(Servo.Direction.REVERSE);
 
         // Set initial position
-        rightPivot.setPosition(servoPosition);
-        leftPivot.setPosition(servoPosition);
+        rightPivot.setPosition(iP);
+        leftPivot.setPosition(iP);
+        outtakeRightPivot.setPosition(oP);
+        outtakeLeftPivot.setPosition(oP);
+        outtakeRotate.setPosition(oR);
+        outtakeGrip.setPosition(oG);
+        outtakeSpin.setPosition(oS);
     }
 
     @Override
     public void loop() {
-        // Clamp servo position to valid range
-        servoPosition = Math.max(minPosition, Math.min(maxPosition, servoPosition));
-
-        // Apply updated servo position
-        rightPivot.setPosition(servoPosition);
-        leftPivot.setPosition(servoPosition);
-
-        telemetry.addData("Servo Position", servoPosition);
-        telemetry.update();
+        rightPivot.setPosition(iP);
+        leftPivot.setPosition(iP);
+        outtakeRightPivot.setPosition(oP);
+        outtakeLeftPivot.setPosition(oP);
+        outtakeRotate.setPosition(oR);
+        outtakeGrip.setPosition(oG);
+        outtakeSpin.setPosition(oS);
     }
 }

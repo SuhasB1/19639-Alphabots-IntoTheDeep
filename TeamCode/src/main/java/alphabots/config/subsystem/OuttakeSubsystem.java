@@ -93,11 +93,7 @@ public class OuttakeSubsystem {
     }
 
     public void switchGrabState() {
-        if (grabState == GrabState.CLOSED) {
-            setGrabState(GrabState.OPEN);
-        } else if (grabState == GrabState.OPEN) {
-            setGrabState(GrabState.CLOSED);
-        }
+        grab.setPosition(outtakeGrabOpen);
     }
 
     public void setPivotState(PivotState pivotState) {
@@ -170,10 +166,10 @@ public class OuttakeSubsystem {
     }
 
     public void specimenScore() {
+        setGrabState(GrabState.CLOSED);
         setRotateState(RotateState.SPECIMENSCORE);
         setPivotState(PivotState.SPECIMENSCORE);
-        setGrabState(GrabState.CLOSED);
-        setSpinState(SpinState.BACKWARD);
+        spin.setPosition(outtakeSpinForward);
     } 
 
     public void init() {

@@ -50,7 +50,7 @@ public class ExtendSubsystem {
     }
 
     public void toQuarter() {
-        setTarget(75);
+        setTarget(100);
     }
 
     public void toHalf() {

@@ -165,7 +165,7 @@ public class Teleop {
 
         //operator
         if (currentGamepad2.left_bumper && !previousGamepad2.left_bumper)
-            intake.idle();
+            outtake.switchGrabState();
 
         if (currentGamepad2.right_bumper && !previousGamepad2.right_bumper)
             intake.switchIntakeState();
@@ -183,8 +183,8 @@ public class Teleop {
         if (currentGamepad2.square && !previousGamepad2.square)
             startTransfer();
 
-        if (currentGamepad2.circle && !previousGamepad2.circle)
-            intake.transfer();
+//        if (currentGamepad2.circle && !previousGamepad2.circle)
+//            intake.transfer();
 
         if (currentGamepad2.triangle && !previousGamepad2.triangle){
             startSample();
@@ -212,6 +212,9 @@ public class Teleop {
         }
         if (gamepad2.right_trigger > 0.1) {
             extend.toQuarter();
+        }
+        if (gamepad2.left_trigger > 0.1) {
+            intake.intake.setPower(0);
         }
         if (currentGamepad2.dpad_down && !previousGamepad2.dpad_down)
             startwiper();

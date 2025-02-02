@@ -62,6 +62,10 @@ public class outtakeTest extends OpMode {
     }
 
     @Override
+    public void stop() {
+    }
+
+    @Override
     public void loop() {
         updatePIDF();
 

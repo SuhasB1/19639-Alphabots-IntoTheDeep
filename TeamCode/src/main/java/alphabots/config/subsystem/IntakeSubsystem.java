@@ -6,12 +6,13 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import alphabots.config.util.VariableStorage;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import com.pedropathing.util.Timer;
 
-import alphabots.config.util.VariableStorage;
+import alphabots.config.util.RobotConstants;
 
 public class IntakeSubsystem { //STILL NEED TO CODE WIPER
     public enum IntakeState {
@@ -37,8 +38,7 @@ public class IntakeSubsystem { //STILL NEED TO CODE WIPER
         wiper = hardwareMap.get(Servo.class, "iW");
         pin0 = hardwareMap.digitalChannel.get("digital0");
         pin1 = hardwareMap.digitalChannel.get("digital1");
-        leftPivot.setDirection(Servo.Direction.FORWARD);
-        rightPivot.setDirection(Servo.Direction.REVERSE);
+        leftPivot.setDirection(Servo.Direction.REVERSE);
         intake.setDirection(CRServo.Direction.REVERSE);
         this.telemetry = telemetry;
         this.intakeState = intakeState;
@@ -47,10 +47,10 @@ public class IntakeSubsystem { //STILL NEED TO CODE WIPER
 
     public void setIntakeState(IntakeState intakeState) {
         if (intakeState == IntakeState.IDLE) {
-            intake.setPower(intakeBoxIdle);
+            intake.setPower(intakeBoxIdle);; // Explicitly referencing constant
             this.intakeState = IntakeState.IDLE;
         } else if (intakeState == IntakeState.INTAKE) {
-            intake.setPower(intakeBoxIntake);
+            intake.setPower(intakeBoxIntake); // Explicitly referencing constant
             this.intakeState = IntakeState.INTAKE;
         } else if (intakeState == IntakeState.OUTTAKE) {
             intake.setPower(intakeBoxOuttake);
@@ -60,81 +60,89 @@ public class IntakeSubsystem { //STILL NEED TO CODE WIPER
 
     public void setPivotState(PivotState pivotState) {
         if (pivotState == PivotState.TRANSFER) {
-            leftPivot.setPosition(intakePivotTransfer);
-            rightPivot.setPosition(intakePivotTransfer);
+            leftPivot.setPosition(RobotConstants.intakePivotTransfer);
+            rightPivot.setPosition(RobotConstants.intakePivotTransfer);
             this.pivotState = PivotState.TRANSFER;
         } else if (pivotState == PivotState.GROUND) {
-            leftPivot.setPosition(intakePivotGround);
-            rightPivot.setPosition(intakePivotGround);
+            leftPivot.setPosition(RobotConstants.intakePivotGround);
+            rightPivot.setPosition(RobotConstants.intakePivotGround);
             this.pivotState = PivotState.GROUND;
         } else if (pivotState == PivotState.HOVER) {
-            leftPivot.setPosition(intakePivotHover);
-            rightPivot.setPosition(intakePivotHover);
+            leftPivot.setPosition(RobotConstants.intakePivotHover);
+            rightPivot.setPosition(RobotConstants.intakePivotHover);
             this.pivotState = PivotState.HOVER;
         }
     }
 
     public void switchIntakeState() {
         if (intakeState == IntakeState.INTAKE) {
-            setIntakeState(IntakeState.IDLE);
+            intake.setPower(RobotConstants.intakeBoxIdle);
         } else if (intakeState == IntakeState.IDLE || intakeState == IntakeState.OUTTAKE) {
-            setIntakeState(IntakeState.INTAKE);
+            intake.setPower(RobotConstants.intakeBoxIntake);
         }
     }
 
     public void switchOuttakeState() {
         if (intakeState == IntakeState.OUTTAKE) {
-            setIntakeState(IntakeState.IDLE);
+            intake.setPower(RobotConstants.intakeBoxIdle);
         } else if (intakeState == IntakeState.INTAKE || intakeState == IntakeState.IDLE) {
-            setIntakeState(IntakeState.OUTTAKE);
+            intake.setPower(RobotConstants.intakeBoxOuttake);
         }
     }
 
     public void intake() {
-        setIntakeState(IntakeState.INTAKE);
+        intake.setPower(RobotConstants.intakeBoxIntake);
     }
 
     public void outtake(){
         setIntakeState(IntakeState.OUTTAKE);
+        intake.setPower(intakeBoxOuttake);
     }
 
     public void swipeOpen() {
-        wiper.setPosition(intakeWiperOpen);
+        wiper.setPosition(RobotConstants.intakeWiperOpen); // Explicitly referencing constant
     }
+
     public void swipeClose() {
-        wiper.setPosition(intakeWiperClose);
+        wiper.setPosition(RobotConstants.intakeWiperClose);; // Explicitly referencing constant
     }
 
     public void idle() {
-        setIntakeState(IntakeState.IDLE);
+        intake.setPower(RobotConstants.intakeBoxIdle);
     }
 
     public void transfer() {
-        setPivotState(PivotState.TRANSFER);
-        setIntakeState(IntakeState.IDLE);
+        leftPivot.setPosition(RobotConstants.intakePivotTransfer);
+        rightPivot.setPosition(RobotConstants.intakePivotTransfer);
+        intake.setPower(RobotConstants.intakeBoxIdle);
     }
 
     public void ground() {
-        setPivotState(PivotState.GROUND);
+        leftPivot.setPosition(RobotConstants.intakePivotGround);
+        rightPivot.setPosition(RobotConstants.intakePivotGround);
     }
 
+
     public void hover() {
-        setPivotState(PivotState.HOVER);
+        leftPivot.setPosition(RobotConstants.intakePivotHover);
+        rightPivot.setPosition(RobotConstants.intakePivotHover);
     }
 
     public void init() {
-        setPivotState(PivotState.TRANSFER);
+        leftPivot.setPosition(RobotConstants.intakePivotTransfer);
+        rightPivot.setPosition(RobotConstants.intakePivotTransfer);
         setIntakeState(IntakeState.IDLE);
-        wiper.setPosition(intakeWiperClose);
+        intake.setPower(RobotConstants.intakeBoxIdle);
+        wiper.setPosition(RobotConstants.intakeWiperClose);
     }
 
     public void start() {
         setPivotState(PivotState.TRANSFER);
         setIntakeState(IntakeState.IDLE);
-        wiper.setPosition(intakeWiperClose);
-
+        wiper.setPosition(RobotConstants.intakeWiperClose);
     }
 
+    //*
     public void autoOuttake(){
         if(VariableStorage.currentTeam == VariableStorage.Team.RED){
             if(pin0.getState() && !pin1.getState()){
@@ -147,6 +155,7 @@ public class IntakeSubsystem { //STILL NEED TO CODE WIPER
             }
         }
     }
+
 
     public void telemetry() {
         telemetry.addData("Intake Box State: ", intakeState);

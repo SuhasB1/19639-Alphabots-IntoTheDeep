@@ -38,7 +38,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
-@Disabled
+
 @Config
 @TeleOp(name="PID_Test_Lift", group="z")
 public class pidTestLift extends OpMode {
@@ -48,8 +48,8 @@ public class pidTestLift extends OpMode {
     public PIDController liftPID;
     public static int target;
     public static double manualLeftPower = 0, manualRightPower = 0;
-    public static double p = 0.00, i = 0, d = 0;
-    public static double f = 0.00;
+    public static double p = 0.052, i = 0, d = 0.00002;
+    public static double f = 0.1;
     private Gamepad currentGamepad2 = new Gamepad(), previousGamepad2 = new Gamepad();
 
     @Override
@@ -59,8 +59,8 @@ public class pidTestLift extends OpMode {
         rightLift = hardwareMap.get(DcMotor.class, "bottomLift");
         leftLift = hardwareMap.get(DcMotor.class, "topLift");
 
-        rightLift.setDirection(DcMotor.Direction.REVERSE);
-        leftLift.setDirection(DcMotor.Direction.FORWARD);
+        rightLift.setDirection(DcMotor.Direction.FORWARD);
+        leftLift.setDirection(DcMotor.Direction.REVERSE);
         leftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);

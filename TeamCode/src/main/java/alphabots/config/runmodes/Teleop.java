@@ -143,14 +143,14 @@ public class Teleop {
         if (currentGamepad1.dpad_down && !previousGamepad1.dpad_down)
             startwiper();
 
-        if (currentGamepad1.circle && !previousGamepad1.circle) {
+        if (currentGamepad1.square && !previousGamepad1.square) {
             intake.ground();
         }
 
         if (currentGamepad1.triangle && !previousGamepad1.triangle)
             intake.hover();
 
-        if (currentGamepad1.square && !previousGamepad1.square)
+        if (currentGamepad1.circle && !previousGamepad1.circle)
             intake.transfer();
         if (currentGamepad1.share && !previousGamepad1.share){
             extend.extend.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -240,14 +240,16 @@ public class Teleop {
     private void transfer() {
         switch (transferState) {
             case 0:
-                outtake.idle();
+                outtake.setRotateState(OuttakeSubsystem.RotateState.IDLE);
+                outtake.setPivotState(OuttakeSubsystem.PivotState.IDLE);
                 outtake.open();
                 telemetry.addLine("started 1");
                 setTransferState(1);
                 break;
             case 1:
                 if (transferTimer.getElapsedTimeSeconds() > 0.35) {
-                    outtake.transfer();
+                    outtake.setRotateState(OuttakeSubsystem.RotateState.TRANSFER);
+                    outtake.setPivotState(OuttakeSubsystem.PivotState.TRANSFER);
                     telemetry.addLine("started 2");
                     setTransferState(2);
                 }
@@ -255,6 +257,7 @@ public class Teleop {
                 break;
             case 2:
                 if (transferTimer.getElapsedTimeSeconds() > 0.2) {
+
                     outtake.close();
                     telemetry.addLine("started 3");
                     setTransferState(-1);
@@ -358,7 +361,7 @@ public class Teleop {
     public void moveDriveTrain()
     {
 
-        double y = -gamepad1.left_stick_y; // Remember, this is reversed!
+        double y = gamepad1.left_stick_y; // Remember, this is reversed!
         double x = gamepad1.left_stick_x; // this is strafing
         double rx = gamepad1.right_stick_x;
 

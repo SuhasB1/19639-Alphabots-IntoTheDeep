@@ -19,6 +19,8 @@ public class SampleTransferFSM extends OpMode {
     }
 
     private State currentState = State.INIT;
+
+
     private long stateStartTime;
 
     private Servo rightPivot, leftPivot;
@@ -45,8 +47,8 @@ public class SampleTransferFSM extends OpMode {
 
         switch (currentState) {
             case INIT:
-                rightPivot.setPosition(0.57);
-                leftPivot.setPosition(0.57);
+                rightPivot.setPosition(0.56);
+                leftPivot.setPosition(0.56);
                 if (elapsedTime > 500) nextState(State.ROTATE_UP);
                 break;
 
@@ -56,7 +58,7 @@ public class SampleTransferFSM extends OpMode {
                 break;
 
             case GRIP:
-                outtakeGrip.setPosition(0);
+                outtakeGrip.setPosition(0.2);
                 if (elapsedTime > 500) nextState(State.PIVOT_DOWN);
                 break;
 
@@ -67,13 +69,13 @@ public class SampleTransferFSM extends OpMode {
                 break;
 
             case ROTATE_DOWN:
-                outtakeRotate.setPosition(0.7);
+                outtakeRotate.setPosition(0.68);
                 if (elapsedTime > 500) nextState(State.RELEASE);
                 break;
 
             case RELEASE:
-                outtakeRightPivot.setPosition(0.045);
-                outtakeLeftPivot.setPosition(0.045);
+                outtakeRightPivot.setPosition(0.015);
+                outtakeLeftPivot.setPosition(0.015);
                 if (elapsedTime > 500) nextState(State.PIVOT_FINAL);
                 break;
 

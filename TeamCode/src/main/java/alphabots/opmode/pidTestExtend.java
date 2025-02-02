@@ -42,7 +42,6 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 
 import alphabots.config.util.action.RunAction;
-@Disabled
 @Config
 @TeleOp(name="PID_Test_Extend", group="z")
 public class pidTestExtend extends OpMode {
@@ -50,12 +49,13 @@ public class pidTestExtend extends OpMode {
     public static int pos;
     public PIDController liftPID;
     public static int target;
-    public static double p = 0.0, i = 0, d = 0;
+    public static double p = 0.02, i = 0, d = 0.00002;
     private Gamepad currentGamepad2 = new Gamepad(), previousGamepad2 = new Gamepad();
 
     @Override
     public void init() {
         extend = hardwareMap.get(DcMotor.class, "extend");
+        extend.setDirection(DcMotor.Direction.REVERSE);
         extend.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         extend.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
@@ -83,7 +83,7 @@ public class pidTestExtend extends OpMode {
         double pid = liftPID.calculate(getPos(), target);
         double power = pid;
 
-        extend.setPower(-power);
+        extend.setPower(power);
 
         telemetry.addData("extend pos", getPos());
         telemetry.addData("extend target", target);

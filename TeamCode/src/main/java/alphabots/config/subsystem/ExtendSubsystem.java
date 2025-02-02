@@ -39,7 +39,7 @@ public class ExtendSubsystem {
             double pid = extendPID.calculate(getPos(), target);
             double power = pid;
 
-            extend.setPower(-power);
+            extend.setPower(power);
     }
 
     public void targetCurrent() {

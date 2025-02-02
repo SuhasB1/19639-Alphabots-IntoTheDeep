@@ -21,8 +21,8 @@ public class LiftSubsystem {
     public RunAction toZero, toHighBucket, toHighChamber, toHumanPlayer, toTransfer, toPark;
     public PIDController liftPID;
     public static int target;
-    public static double p = 0.013, i = 0, d = 0.0002;
-    public static double f = 0.1;
+    public static double p = 0.05, i = 0.0005, d = 0.00001;
+    public static double f = 0.15;
 
 
     public LiftSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
@@ -32,8 +32,8 @@ public class LiftSubsystem {
         rightLift = hardwareMap.get(DcMotor.class, "bottomLift");
         leftLift = hardwareMap.get(DcMotor.class, "topLift");
         //day b4 comp add variable storage
-        rightLift.setDirection(DcMotor.Direction.REVERSE);
-        leftLift.setDirection(DcMotor.Direction.FORWARD);
+        rightLift.setDirection(DcMotor.Direction.FORWARD);
+        leftLift.setDirection(DcMotor.Direction.REVERSE);
         leftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -62,8 +62,9 @@ public class LiftSubsystem {
                 double ticks_in_degrees = 537.7 / 360.0;
                 double ff = Math.cos(Math.toRadians(target / ticks_in_degrees)) * f;
                 double power = pid + ff;
-                rightLift.setPower(power);
+                power = Math.max(power,-0.7);
                 leftLift.setPower(power);
+                rightLift.setPower(power);
             }
     }
 
@@ -107,7 +108,7 @@ public class LiftSubsystem {
     }
 
     public void toHighBucket() {
-        setTarget(liftToHighBucket);
+        setTarget(RobotConstants.liftToHighBucket);
     }
 
     public void toHighChamber() {

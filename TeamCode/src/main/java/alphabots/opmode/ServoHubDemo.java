@@ -5,6 +5,7 @@ import static alphabots.config.util.RobotConstants.*;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.Servo;
 
 
@@ -18,10 +19,17 @@ public class ServoHubDemo extends OpMode {
     Servo outtakeRotate;
     Servo outtakeSpin;
     Servo outtakeGrip;
+    CRServo intakeB;
+
+    Servo intakeWiper;
+
+
 
 
     public static double iP = 1;
+    public static double iW = 1;
     public static double oP = 1;
+    public static double iB = -1;
     public static double oR = 1;
     public static double oS = 1;
     public static double oG = 1;
@@ -35,10 +43,14 @@ public class ServoHubDemo extends OpMode {
         outtakeRotate = hardwareMap.get(Servo.class, "oR");
         outtakeSpin = hardwareMap.get(Servo.class, "oS");
         outtakeGrip = hardwareMap.get(Servo.class, "oG");
+        intakeB = hardwareMap.get(CRServo.class, "iB");
+        intakeWiper = hardwareMap.get(Servo.class, "iW");
         outtakeLeftPivot.setDirection(Servo.Direction.REVERSE);
         leftPivot.setDirection(Servo.Direction.REVERSE);
-
+        intakeWiper.setDirection(Servo.Direction.REVERSE);
         // Set initial position
+        intakeB.setPower(iB);
+        intakeWiper.setPosition(iW);
         rightPivot.setPosition(iP);
         leftPivot.setPosition(iP);
         outtakeRightPivot.setPosition(oP);
@@ -53,9 +65,11 @@ public class ServoHubDemo extends OpMode {
         rightPivot.setPosition(iP);
         leftPivot.setPosition(iP);
         outtakeRightPivot.setPosition(oP);
+        outtakeRightPivot.setPosition(oP);
         outtakeLeftPivot.setPosition(oP);
         outtakeRotate.setPosition(oR);
         outtakeGrip.setPosition(oG);
         outtakeSpin.setPosition(oS);
+        intakeB.setPower(iB);
     }
 }

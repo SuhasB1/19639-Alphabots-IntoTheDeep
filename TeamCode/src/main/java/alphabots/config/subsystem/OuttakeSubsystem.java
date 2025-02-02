@@ -8,6 +8,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
+import alphabots.config.util.RobotConstants;
+
 
 public class OuttakeSubsystem {
 
@@ -41,8 +43,8 @@ public class OuttakeSubsystem {
         spin = hardwareMap.get(Servo.class, "oS");
         leftPivot = hardwareMap.get(Servo.class, "oLP");
         rightPivot = hardwareMap.get(Servo.class, "oRP");
-        rightPivot.setDirection(Servo.Direction.REVERSE);
-        grab.setDirection(Servo.Direction.REVERSE);
+
+        leftPivot.setDirection(Servo.Direction.REVERSE);
         this.telemetry = telemetry;
         this.grabState = grabState;
         this.rotateState = rotateState;
@@ -131,24 +133,28 @@ public class OuttakeSubsystem {
     }
 
     public void idle() {
-        setRotateState(RotateState.IDLE);
-        setPivotState(PivotState.IDLE);
-        setGrabState(GrabState.OPEN);
-        setSpinState(SpinState.FORWARD);
+        rotate.setPosition(RobotConstants.outtakeRotateIdle);
+        leftPivot.setPosition(RobotConstants.outtakePivotIdle);
+        rightPivot.setPosition(RobotConstants.outtakePivotIdle);
+        grab.setPosition(RobotConstants.outtakeGrabOpen);
+        spin.setPosition(outtakeSpinForward);
+
     }
 
     public void transfer() {
-        setRotateState(RotateState.TRANSFER);
-        setPivotState(PivotState.TRANSFER);
-        setGrabState(GrabState.OPEN);
-        setSpinState(SpinState.FORWARD);
+        grab.setPosition(RobotConstants.outtakeGrabOpen);
+        rotate.setPosition(RobotConstants.outtakeRotateTransfer);
+        leftPivot.setPosition(RobotConstants.outtakePivotTransfer);
+        rightPivot.setPosition(RobotConstants.outtakePivotTransfer);
+        spin.setPosition(RobotConstants.outtakeSpinBackward);
     }
 
     public void score() {
-        setRotateState(RotateState.SCORE);
-        setPivotState(PivotState.SCORE);
-        setGrabState(GrabState.CLOSED);
-        setSpinState(SpinState.FORWARD);
+        grab.setPosition(RobotConstants.outtakeGrabClose);
+        rotate.setPosition(RobotConstants.outtakeRotateScore);
+        leftPivot.setPosition(RobotConstants.outtakePivotScore);
+        rightPivot.setPosition(RobotConstants.outtakePivotScore);
+        spin.setPosition(RobotConstants.outtakeSpinForward);
     }
 
     public void specimenGrab() {

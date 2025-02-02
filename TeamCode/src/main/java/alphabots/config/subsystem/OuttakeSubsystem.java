@@ -146,7 +146,7 @@ public class OuttakeSubsystem {
         rotate.setPosition(RobotConstants.outtakeRotateTransfer);
         leftPivot.setPosition(RobotConstants.outtakePivotTransfer);
         rightPivot.setPosition(RobotConstants.outtakePivotTransfer);
-        spin.setPosition(RobotConstants.outtakeSpinBackward);
+        spin.setPosition(RobotConstants.outtakeSpinForward);
     }
 
     public void score() {
@@ -173,7 +173,7 @@ public class OuttakeSubsystem {
         setRotateState(RotateState.SPECIMENSCORE);
         setPivotState(PivotState.SPECIMENSCORE);
         setGrabState(GrabState.CLOSED);
-        setSpinState(SpinState.FORWARD);
+        setSpinState(SpinState.BACKWARD);
     } 
 
     public void init() {

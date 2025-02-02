@@ -35,6 +35,7 @@ public class Drive extends OpMode {
     @Override
     public void loop() {
         teleop.update();
+        telemetry.update();
 
     }
 

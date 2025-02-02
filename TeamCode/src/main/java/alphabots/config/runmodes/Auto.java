@@ -372,7 +372,7 @@ public class Auto {
                 break;
             case 2:
                 if(intakeTimer.getElapsedTimeSeconds() > 0) {
-                    extend.setTarget(700);
+                    extend.setTarget(300);
                     intakeTimer.resetTimer();
                     setIntakeState(10);
                 }
@@ -385,7 +385,7 @@ public class Auto {
                 break;
             case 11:
                 if(intakeTimer.getElapsedTimeSeconds() > 0.2) {
-                    extend.addToTarget(450);
+                    extend.addToTarget(150);
                     intakeTimer.resetTimer();
                     setIntakeState(3);
                 }

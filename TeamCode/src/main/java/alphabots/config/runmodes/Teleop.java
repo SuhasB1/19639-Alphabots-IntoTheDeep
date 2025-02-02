@@ -108,6 +108,7 @@ public class Teleop {
 
         lift.leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         lift.rightLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        lift.toZero();
 
         extend.extend.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         extend.extend.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -130,28 +131,31 @@ public class Teleop {
 
         if (gamepad1.left_trigger > 0.1) {
             extend.toZero();
-            intake.hover();
         }
 
-        if (gamepad1.right_bumper && extend.getTarget() < 1200)
-            extend.addToTarget(40);
+        if (gamepad1.right_bumper && extend.getTarget() < 220) //CHANGE NUMBER AT COMP FOR EXTENSION LIMITS
+            extend.addToTarget(16);
         else if (gamepad1.left_bumper)
-            extend.addToTarget(-20);
+            extend.addToTarget(-8);
         else
             extend.addToTarget(0);
 
         if (currentGamepad1.dpad_down && !previousGamepad1.dpad_down)
             startwiper();
 
+        if (currentGamepad1.dpad_left && !previousGamepad1.dpad_left)
+            outtake.open();
+
+        if (currentGamepad1.dpad_right && !previousGamepad1.dpad_right)
+            outtake.close();
+
         if (currentGamepad1.square && !previousGamepad1.square) {
-            intake.ground();
+            intake.transfer();
         }
 
-        if (currentGamepad1.triangle && !previousGamepad1.triangle)
-            intake.hover();
-
         if (currentGamepad1.circle && !previousGamepad1.circle)
-            intake.transfer();
+            intake.ground();
+
         if (currentGamepad1.share && !previousGamepad1.share){
             extend.extend.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             extend.extend.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -161,7 +165,7 @@ public class Teleop {
 
         //operator
         if (currentGamepad2.left_bumper && !previousGamepad2.left_bumper)
-            outtake.switchGrabState(); //claw open or close
+            intake.idle();
 
         if (currentGamepad2.right_bumper && !previousGamepad2.right_bumper)
             intake.switchIntakeState();
@@ -184,6 +188,17 @@ public class Teleop {
 
         if (currentGamepad2.triangle && !previousGamepad2.triangle){
             startSample();
+        }
+
+        if(currentGamepad2.left_stick_button && !previousGamepad2.left_stick_button){
+            outtake.open();
+        }
+        if(currentGamepad2.right_stick_button && !previousGamepad2.right_stick_button){
+            outtake.close();
+        }
+
+        if (currentGamepad2.touchpad && !previousGamepad2.touchpad){
+            outtake.setSpinState(OuttakeSubsystem.SpinState.BACKWARD);
         }
 
         if (currentGamepad2.dpad_left && !previousGamepad2.dpad_left)

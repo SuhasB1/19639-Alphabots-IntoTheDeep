@@ -44,7 +44,7 @@ public class LiftSubsystem {
     }
 
     public void updatePIDF(){
-            if (getTarget() == liftToZero && getPos() < 60) {
+            if (getTarget() == liftToZero && getPos() < 4) {
                 leftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 rightLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
@@ -62,7 +62,7 @@ public class LiftSubsystem {
                 double ticks_in_degrees = 537.7 / 360.0;
                 double ff = Math.cos(Math.toRadians(target / ticks_in_degrees)) * f;
                 double power = pid + ff;
-                power = Math.max(power,-0.7);
+                power = Math.max(power,-0.4);
                 leftLift.setPower(power);
                 rightLift.setPower(power);
             }

@@ -48,6 +48,6 @@ public class RobotConstants {
 
     public static boolean software_are_bums = true;
 
-    public static boolean ronit_not_a_bum = true;
+    public static boolean ronit_wants_to_die = true;
 
 }

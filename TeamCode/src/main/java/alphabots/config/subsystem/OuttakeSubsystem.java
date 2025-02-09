@@ -147,9 +147,9 @@ public class OuttakeSubsystem {
 
     public void score() {
         grab.setPosition(RobotConstants.outtakeGrabClose);
-        rotate.setPosition(RobotConstants.outtakeRotateScore);
         leftPivot.setPosition(RobotConstants.outtakePivotScore);
         rightPivot.setPosition(RobotConstants.outtakePivotScore);
+        rotate.setPosition(RobotConstants.outtakeRotateScore);
         spin.setPosition(RobotConstants.outtakeSpinForward);
     }
 

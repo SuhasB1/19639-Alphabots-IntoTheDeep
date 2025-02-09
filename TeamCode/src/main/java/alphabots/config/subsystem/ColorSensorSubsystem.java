@@ -1,29 +1,18 @@
 package alphabots.config.subsystem;
 
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynchSimple;
-import com.qualcomm.robotcore.hardware.Servo;
-
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 
-public class ColorSensorSubsystem{
-    private Telemetry telemetry;
-    public ColorRangefinder crf;
-    public ColorSensorSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
-        crf = new ColorRangefinder(hardwareMap.get(RevColorSensorV3.class, "Color"));
+@TeleOp
+public class ColorSensorSubsystem extends LinearOpMode {
+    @Override
+    public void runOpMode() throws InterruptedException {
+        ColorRangefinder crf =
+                new ColorRangefinder(hardwareMap.get(RevColorSensorV3.class, "Color"));
 
-        this.telemetry = telemetry;
-        this.telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-    }
-
-    public void setDigitalPins() {
         /*
         Using this example configuration, you can detect all three sample colors based on which pin is reading true:
         both      --> yellow
@@ -32,13 +21,16 @@ public class ColorSensorSubsystem{
         neither   --> no object
          */
         crf.setPin0Digital(ColorRangefinder.DigitalMode.HSV, 180 / 360.0 * 255, 250 / 360.0 * 255); // blue
-        crf.setPin0Digital(ColorRangefinder.DigitalMode.HSV, 55 / 360.0 * 255, 75 / 360.0 * 255); // yellow
-        crf.setPin0DigitalMaxDistance(ColorRangefinder.DigitalMode.HSV, 20); // 20mm or closer requirement
+        crf.setPin0Digital(ColorRangefinder.DigitalMode.HSV, 55 / 360.0 * 255, 90 / 360.0 * 255); // yellow
+        crf.setPin0DigitalMaxDistance(ColorRangefinder.DigitalMode.HSV, 75); // 20mm or closer requirement
 
-        crf.setPin1Digital(ColorRangefinder.DigitalMode.HSV, 140 / 360.0 * 255, 210 / 360.0 * 255); // inverted red
-        crf.setPin1Digital(ColorRangefinder.DigitalMode.HSV, 235 / 360.0 * 255, 255 / 360.0 * 255); // inverted yellow
-        crf.setPin1DigitalMaxDistance(ColorRangefinder.DigitalMode.HSV, 20); // 20mm or closer requirement
-        crf.setPin1InvertHue(); // invert hue values
+        crf.setPin1Digital(ColorRangefinder.DigitalMode.HSV, 0 / 360.0 * 255, 50 / 360.0 * 255); // red
+        crf.setPin1Digital(ColorRangefinder.DigitalMode.HSV, 55 / 360.0 * 255, 90 / 360.0 * 255); // yellow
+        crf.setPin1DigitalMaxDistance(ColorRangefinder.DigitalMode.HSV, 75); // 20mm or closer requirement
+
+        waitForStart();
+
+        stop();
     }
 }
 

@@ -76,27 +76,26 @@ public class IntakeSubsystem { //STILL NEED TO CODE WIPER
 
     public void switchIntakeState() {
         if (intakeState == IntakeState.INTAKE) {
-            intake.setPower(RobotConstants.intakeBoxIdle);
+            setIntakeState(IntakeState.IDLE);
         } else if (intakeState == IntakeState.IDLE || intakeState == IntakeState.OUTTAKE) {
-            intake.setPower(RobotConstants.intakeBoxIntake);
+            setIntakeState(IntakeState.INTAKE);
         }
     }
 
     public void switchOuttakeState() {
         if (intakeState == IntakeState.OUTTAKE) {
-            intake.setPower(RobotConstants.intakeBoxIdle);
+            setIntakeState(IntakeState.IDLE);
         } else if (intakeState == IntakeState.INTAKE || intakeState == IntakeState.IDLE) {
-            intake.setPower(RobotConstants.intakeBoxOuttake);
+            setIntakeState(IntakeState.OUTTAKE);
         }
     }
 
     public void intake() {
-        intake.setPower(RobotConstants.intakeBoxIntake);
+        setIntakeState(IntakeState.INTAKE);
     }
 
     public void outtake(){
         setIntakeState(IntakeState.OUTTAKE);
-        intake.setPower(intakeBoxOuttake);
     }
 
     public void swipeOpen() {
@@ -108,37 +107,30 @@ public class IntakeSubsystem { //STILL NEED TO CODE WIPER
     }
 
     public void idle() {
-        intake.setPower(RobotConstants.intakeBoxIdle);
+        setIntakeState(IntakeState.IDLE);
     }
 
     public void transfer() {
-        leftPivot.setPosition(RobotConstants.intakePivotTransfer);
-        rightPivot.setPosition(RobotConstants.intakePivotTransfer);
-        intake.setPower(RobotConstants.intakeBoxIdle);
+        setPivotState(PivotState.TRANSFER);
     }
 
     public void ground() {
-        leftPivot.setPosition(RobotConstants.intakePivotGround);
-        rightPivot.setPosition(RobotConstants.intakePivotGround);
+        setPivotState(PivotState.GROUND);
     }
 
 
     public void hover() {
-        leftPivot.setPosition(RobotConstants.intakePivotHover);
-        rightPivot.setPosition(RobotConstants.intakePivotHover);
+        setPivotState(PivotState.HOVER);
     }
 
     public void init() {
-        leftPivot.setPosition(RobotConstants.intakePivotTransfer);
-        rightPivot.setPosition(RobotConstants.intakePivotTransfer);
+        setPivotState(PivotState.TRANSFER);
         setIntakeState(IntakeState.IDLE);
-        intake.setPower(RobotConstants.intakeBoxIdle);
         wiper.setPosition(RobotConstants.intakeWiperClose);
     }
 
     public void start() {
         setPivotState(PivotState.TRANSFER);
-        setIntakeState(IntakeState.IDLE);
         wiper.setPosition(RobotConstants.intakeWiperClose);
     }
 

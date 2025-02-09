@@ -296,19 +296,24 @@ public class Teleop {
     private void sample() {
         switch (sampleState) {
             case 0:
+                outtake.close();
                 outtake.idle();
                 outtake.close();
+                outtake.score();
                 lift.toHighBucket();
+                if (lift.getPos() > RobotConstants.liftToHighBucket - 150) {
+                    telemetry.addLine("started 2");
+                    setSampleState(-1);
+                }
                 telemetry.addLine("started 1");
                 setSampleState(1);
                 break;
             case 1:
-                if (lift.getPos() > RobotConstants.liftToHighBucket - 150) {
-                    outtake.score();
-                    outtake.close();
-                    telemetry.addLine("started 2");
-                    setSampleState(-1);
-                }
+                outtake.open();
+                setSampleState(2);
+                break;
+            case 2:
+
                 break;
         }
     }

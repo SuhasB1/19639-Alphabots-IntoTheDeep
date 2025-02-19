@@ -60,7 +60,7 @@ public class Teleop {
     private Gamepad previousGamepad2 = new Gamepad();
 
 
-    public double speed = 0.75;
+    public double speed = 1;
 
     String mode = "intake";
 
@@ -102,11 +102,11 @@ public class Teleop {
         extend.setLimitToSample();
         intake.start();
 
-        Constants.setConstants(FConstants.class,LConstants.class);
+        Constants.setConstants(FConstants.class, LConstants.class);
 
     }
 
-    public void start(){
+    public void start() {
         lift.leftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         lift.rightLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
@@ -126,36 +126,54 @@ public class Teleop {
         currentGamepad2.copy(gamepad2);
 
         //driver
-        if(currentGamepad1.dpad_down && !previousGamepad1.dpad_down && mode.equals("intake")){
+        if (currentGamepad1.dpad_down && !previousGamepad1.dpad_down && mode.equals("intake")) {
             startwiper();
         }
-        if(currentGamepad1.left_bumper && !previousGamepad1.left_bumper && mode.equals("intake")){
+        if (currentGamepad1.right_bumper && !previousGamepad1.right_bumper && mode.equals("intake")) {
             intake.intake();
             intake.ground();
         }
-        if(currentGamepad1.right_bumper && !previousGamepad1.right_bumper && mode.equals("intake")){
+        if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper && mode.equals("intake")) {
             startTransfer();
         }
 
-        if(currentGamepad1.left_trigger > 0.1 && mode.equals("intake")){
+        if (currentGamepad1.left_trigger > 0.1 && mode.equals("intake")) {
             extend.toZero();
+            outtake.idle();
             intake.transfer();
             intake.idle();
             target = 0;
         }
-        if(currentGamepad1.right_trigger > 0.1 && mode.equals("intake")){
+        if (currentGamepad1.right_trigger > 0.1 && mode.equals("intake")) {
             extend.setTarget(RobotConstants.extendFullSample);
         }
-        if(currentGamepad1.dpad_left && !previousGamepad1.dpad_left){
+        if (currentGamepad1.dpad_left && !previousGamepad1.dpad_left) {
             mode = "intake";
         }
-        if(currentGamepad1.dpad_right && !previousGamepad1.dpad_right){
-            mode = "specimen";
+        if (lift.getTarget() <= 10 && currentGamepad1.right_stick_button && !previousGamepad1.right_stick_button && mode.equals("intake")) {
+            intake.switchOuttakeState();
         }
-        if(currentGamepad1.cross && !previousGamepad1.cross && mode.equals("intake")){
+        if (currentGamepad1.dpad_left && !previousGamepad1.dpad_left && mode.equals("intake")) {
+            intake.swipeOpen();
+        }
+        if (currentGamepad1.dpad_right && !previousGamepad1.dpad_right && mode.equals("intake")) {
+            intake.swipeOpen();
+        }
+        if (currentGamepad1.dpad_up && !previousGamepad1.dpad_up && mode.equals("intake")) {
+            startwiper();
+        }
+        if (lift.getTarget() <= 10 && currentGamepad1.left_stick_button && !previousGamepad1.left_stick_button && mode.equals("intake")) {
+            intake.switchIntakeState();
+        }
+
+
+        // if(currentGamepad1.dpad_right && !previousGamepad1.dpad_right){
+        // mode = "specimen";
+        // }
+        if (currentGamepad1.cross && !previousGamepad1.cross && mode.equals("intake")) {
             startReset();
         }
-        if(currentGamepad1.triangle && !previousGamepad1.triangle && mode.equals("intake")){
+        if (currentGamepad1.triangle && !previousGamepad1.triangle && mode.equals("intake")) {
             startSample();
         }
 
@@ -166,12 +184,14 @@ public class Teleop {
         wiper();
         reset();
         moveDriveTrain();
-
-        //follower.update();
+        intake.prevent2sample();
+        intake.autoOuttake();
+        intake.autoOuttake();
+        intake.prevent2sample();
         addTelemetry();
     }
 
-    public void addTelemetry(){
+    public void addTelemetry() {
         extend.telemetry();
         lift.telemetry();
         outtake.telemetry();
@@ -237,23 +257,24 @@ public class Teleop {
         switch (sampleState) {
             case 0:
                 outtake.close();
-                outtake.idle();
-                outtake.close();
-                outtake.score();
                 lift.toHighBucket();
-                if (lift.getPos() > RobotConstants.liftToHighBucket - 150) {
-                    telemetry.addLine("started 2");
-                    setSampleState(-1);
-                }
                 telemetry.addLine("started 1");
                 setSampleState(1);
                 break;
             case 1:
-                outtake.open();
-                setSampleState(2);
+                if (lift.getPos() > 200) {
+                    outtake.close();
+                    outtake.score();
+                    telemetry.addLine("started 2");
+                    setSampleState(2);
+                }
                 break;
             case 2:
-
+                if (lift.getPos() > RobotConstants.liftToHighBucket - 150) {
+                    telemetry.addLine("started 3");
+                    outtake.close();
+                    setSampleState(-1);
+                }
                 break;
         }
     }
@@ -274,7 +295,7 @@ public class Teleop {
                 setwiperState(1);
                 break;
             case 1:
-                if(wiperTimer.getElapsedTimeSeconds() > 0.25) {
+                if (wiperTimer.getElapsedTimeSeconds() > 0.25) {
                     intake.swipeClose();
                     setwiperState(2);
                 }
@@ -321,10 +342,9 @@ public class Teleop {
         setResetState(0);
     }
 
-    public void moveDriveTrain()
-    {
+    public void moveDriveTrain() {
 
-        double y = gamepad1.left_stick_y; // Remember, this is reversed!
+        double y = -gamepad1.left_stick_y; // Remember, this is reversed!
         double x = gamepad1.left_stick_x; // this is strafing
         double rx = gamepad1.right_stick_x;
 

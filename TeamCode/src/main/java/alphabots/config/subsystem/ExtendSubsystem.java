@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 public class ExtendSubsystem {
     private Telemetry telemetry;
@@ -36,7 +37,7 @@ public class ExtendSubsystem {
             extend.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
             double pid = extendPID.calculate(getPos(), target);
             double power = pid;
-
+            power = Math.max(power, -0.9);
             extend.setPower(power);
     }
 
@@ -100,5 +101,6 @@ public class ExtendSubsystem {
     public void telemetry() {
         telemetry.addData("Extend Pos: ", getPos());
         telemetry.addData("extend targer:", getTarget());
+        telemetry.addData("extend current", extend.getCurrent(CurrentUnit.AMPS));
     }
 }

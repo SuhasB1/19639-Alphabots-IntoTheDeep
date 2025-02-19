@@ -15,45 +15,23 @@ import alphabots.config.util.VariableStorage;
 public class AutoOuttakeTest extends OpMode {
 
     public static double power = 1;
-    boolean detected;
-    CRServo servo;
+    private IntakeSubsystem intake;
+    private IntakeSubsystem.IntakeState intakeBoxState;
 
-    DigitalChannel pin0, pin1;
+    private IntakeSubsystem.PivotState intakePivotState;
+
 
     @Override
     public void init() {
-        detected = false;
-        pin0 = hardwareMap.digitalChannel.get("digital0");
-        pin1 = hardwareMap.digitalChannel.get("digital1");
-        servo = hardwareMap.get(CRServo.class, "servo1");
-        servo.setDirection(CRServo.Direction.REVERSE);
-
+        intake = new IntakeSubsystem(hardwareMap, telemetry, intakeBoxState, intakePivotState);
+        intake.intake();
     }
 
     @Override
     public void loop() {
-        autoOuttake();
-        telemetry.addData("digital 0", pin0.getState());
-        telemetry.addData("digital 1", pin1.getState());
-        telemetry.addData("isDetected", detected);
-    }
-
-    public void autoOuttake(){
-        if(VariableStorage.currentTeam == VariableStorage.Team.RED){
-            if(pin0.getState() && !pin1.getState()){
-                servo.setPower(-power);
-                detected = true;
-            }else {
-                servo.setPower(power);
-            }
-        }
-        if(VariableStorage.currentTeam == VariableStorage.Team.BLUE){
-            if(!pin0.getState() && pin1.getState()){
-                servo.setPower(-power);
-                detected = true;
-            }else{
-                servo.setPower(power);
-            }
-        }
+        intake.autoOuttake();
+        intake.prevent2sample();
+        intake.telemetry();
+        telemetry.update();
     }
 }

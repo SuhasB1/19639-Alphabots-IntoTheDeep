@@ -48,8 +48,9 @@ public class pidTestLift extends OpMode {
     public PIDController liftPID;
     public static int target;
     public static double manualLeftPower = 0, manualRightPower = 0;
-    public static double p = 0.052, i = 0, d = 0.00002;
-    public static double f = 0.1;
+    public static double maxRetractPowerPositiveVal = 0.8;
+    public static double p = 0.012, i = 0, d = 0.0001;
+    public static double f = 0.15;
     private Gamepad currentGamepad2 = new Gamepad(), previousGamepad2 = new Gamepad();
 
     @Override
@@ -90,12 +91,13 @@ public class pidTestLift extends OpMode {
     public void updatePIDF(){
         if (!manual) {
             liftPID.setPID(p,i,d);
-            rightLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            leftLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            rightLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+            leftLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
             double pid = liftPID.calculate(getLeftPos(), target);
             double ticks_in_degrees = 537.7 / 360.0;
             double ff = Math.cos(Math.toRadians(target / ticks_in_degrees)) * f;
             double power = pid + ff;
+            power = Math.max(-maxRetractPowerPositiveVal,power);
 
             rightLift.setPower(power);
             leftLift.setPower(power);

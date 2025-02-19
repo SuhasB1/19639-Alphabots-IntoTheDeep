@@ -133,7 +133,7 @@ public class OuttakeSubsystem {
         leftPivot.setPosition(RobotConstants.outtakePivotIdle);
         rightPivot.setPosition(RobotConstants.outtakePivotIdle);
         grab.setPosition(RobotConstants.outtakeGrabOpen);
-        spin.setPosition(outtakeSpinForward);
+        spin.setPosition(RobotConstants.outtakeSpinForward);
 
     }
 

@@ -26,7 +26,6 @@ import java.util.List;
 
 import alphabots.pedroPathing.constants.FConstants;
 import alphabots.pedroPathing.constants.LConstants;
-@Disabled
 @TeleOp(name = "Motor Directions", group = "Teleop Test")
 public class MotorDirections extends OpMode {
     private Telemetry telemetryA;

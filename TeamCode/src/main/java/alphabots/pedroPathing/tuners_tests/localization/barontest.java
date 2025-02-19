@@ -10,7 +10,6 @@ import alphabots.pedroPathing.constants.LConstants;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-@Disabled
 @TeleOp(name = "barontest")
 public class barontest extends OpMode {
     MultipleTelemetry telemetrya = new MultipleTelemetry(telemetry);

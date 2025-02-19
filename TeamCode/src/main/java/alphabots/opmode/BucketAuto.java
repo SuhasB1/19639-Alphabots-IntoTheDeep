@@ -23,27 +23,30 @@ public class BucketAuto extends OpMode {
     public Auto auto;
     private Timer pathTimer, actionTimer, opmodeTimer;
     private int pathState;
-    private final Pose startPose = new Pose(7.75, 105.75, Math.toRadians(180));
+    private final Pose startPose = new Pose(7.75, 112.696, Math.toRadians(270));
 
-    private final Pose score1Pose = new Pose(18, 121, Math.toRadians(325));
+    private final Pose score1Pose = new Pose(17.5, 127, Math.toRadians(322));
 
-    private final Pose score2Pose = new Pose(18, 121, Math.toRadians(325));
-    private final Pose score3Pose = new Pose(18, 121, Math.toRadians(325));
-    private final Pose score4Pose = new Pose(18, 121, Math.toRadians(325));
+    private final Pose score2Pose = new Pose(17, 127, Math.toRadians(322));
+    private final Pose score3Pose = new Pose(16.5, 127, Math.toRadians(322));
+    private final Pose score4Pose = new Pose(16.5, 127, Math.toRadians(322));
+    private final Pose score5Pose = new Pose(16.5, 127, Math.toRadians(322));
 
 
-    private final Pose pickup1Pose = new Pose(20.67, 122.2, Math.toRadians(350));
+    private final Pose pickup1Pose = new Pose(24.5, 119.2, Math.toRadians(0));
 
-    private final Pose pickup2Pose = new Pose(19.6, 123.5, Math.toRadians(6.4));
+    private final Pose pickup2Pose = new Pose(24, 128.7, Math.toRadians(0));
 
-    private final Pose pickup3Pose = new Pose(24.7, 121.5, Math.toRadians(45));
+    private final Pose pickup3Pose = new Pose(32.5, 126, Math.toRadians(35));
+
+    private final Pose pickup4Pose = new Pose(32.5, 126, Math.toRadians(35));
 
     private final Pose parkPose = new Pose(63, 95, Math.toRadians(90));
 
-    private final Pose parkControlPose = new Pose(70, 110, Math.toRadians(90));
+    private final Pose parkControlPose = new Pose(50, 150, Math.toRadians(90));
 
     private Path scorePreload, park;
-    private PathChain grabPickup1, grabPickup2, grabPickup3, scorePickup1, scorePickup2, scorePickup3;
+    private PathChain grabPickup1, grabPickup2, grabPickup3, grabPickup4, scorePickup1, scorePickup2, scorePickup3, scorePickup4;
 
     public void buildPaths() {
         scorePreload = new Path(new BezierLine(new Point(startPose), new Point(score1Pose)));
@@ -79,6 +82,16 @@ public class BucketAuto extends OpMode {
                 .setLinearHeadingInterpolation(pickup3Pose.getHeading(), score4Pose.getHeading())
                 .build();
 
+        grabPickup4 = follower.pathBuilder()
+                .addPath(new BezierLine(new Point(score4Pose), new Point(pickup4Pose)))
+                .setLinearHeadingInterpolation(score4Pose.getHeading(), pickup4Pose.getHeading())
+                .build();
+
+        scorePickup4 = follower.pathBuilder()
+                .addPath(new BezierLine(new Point(pickup4Pose), new Point(score5Pose)))
+                .setLinearHeadingInterpolation(pickup4Pose.getHeading(), score5Pose.getHeading())
+                .build();
+
         park = new Path(new BezierCurve(new Point(score4Pose), new Point(parkControlPose), new Point(parkPose)));
         park.setLinearHeadingInterpolation(score4Pose.getHeading(), parkPose.getHeading());
     }
@@ -87,108 +100,137 @@ public class BucketAuto extends OpMode {
         switch (pathState) {
             case 0:
                 auto.startTransfer();
-                follower.setMaxPower(0.6);
                 follower.followPath(scorePreload);
-                setPathState(50);
-                break;
-            case 50:
-                if(!follower.isBusy() && auto.actionNotBusy()) {
-                    auto.startBucket();
-                    setPathState(1);
-                }
+                setPathState(1);
                 break;
             case 1:
-                if(!follower.isBusy() && auto.actionNotBusy()) {
-                    follower.setMaxPower(0.6);
-                    auto.startIntake();
-                    follower.followPath(grabPickup1,true);
-                    setPathState(150);
-                }
-                break;
-            case 150:
-                if(!follower.isBusy() && auto.actionNotBusy()) {
-                    auto.startTransfer();
+                if(follower.getCurrentTValue() > 0.95 && auto.actionNotBusy()) {
+                    auto.startBucket();
                     setPathState(2);
                 }
                 break;
             case 2:
-                if(!follower.isBusy() && auto.actionNotBusy()) {
-                    follower.setMaxPower(0.6);
-                    follower.followPath(scorePickup1,true);
-                    setPathState(200);
-                }
-                break;
-            case 200:
-                if(!follower.isBusy() && auto.actionNotBusy()) {
-                    auto.startBucket();
+                if(follower.getCurrentTValue() > 0.95 && auto.actionNotBusy()) {
+                    follower.followPath(grabPickup1,true);
                     setPathState(3);
                 }
                 break;
             case 3:
-                if(!follower.isBusy() && auto.actionNotBusy()) {
-                    follower.setMaxPower(0.7);
+                if(follower.getCurrentTValue() > 0.99 && auto.actionNotBusy()) {
                     auto.startIntake();
-                    follower.followPath(grabPickup2,true);
-                    setPathState(250);
-                }
-                break;
-            case 250:
-                if(!follower.isBusy() && auto.actionNotBusy()) {
-                    auto.startTransfer();
                     setPathState(4);
                 }
                 break;
             case 4:
-                if(!follower.isBusy() && auto.actionNotBusy()) {
-                    follower.setMaxPower(0.6);
-                    follower.followPath(scorePickup2,true);
-                    setPathState(300);
-                }
-                break;
-            case 300:
-                if(!follower.isBusy() && auto.actionNotBusy()) {
-                    auto.startBucket();
+                if(follower.getCurrentTValue() > 0.95 && auto.actionNotBusy()) {
+                    auto.startTransfer();
                     setPathState(5);
                 }
                 break;
             case 5:
-                if(!follower.isBusy() && auto.actionNotBusy()) {
-                    follower.setMaxPower(0.7);
-                    auto.startIntake();
-                    follower.followPath(grabPickup3,true);
-                    setPathState(350);
-                }
-                break;
-            case 350:
-                if(!follower.isBusy() && auto.actionNotBusy()) {
-                    auto.startTransfer();
+                if(follower.getCurrentTValue() > 0.95 && auto.actionNotBusy()) {
+                    follower.followPath(scorePickup1,true);
                     setPathState(6);
                 }
                 break;
             case 6:
-                if(!follower.isBusy() && auto.actionNotBusy()) {
-                    follower.setMaxPower(0.6);
-                    follower.followPath(scorePickup3, true);
-                    setPathState(400);
-                }
-                break;
-            case 400:
-                if(!follower.isBusy() && auto.actionNotBusy()) {
+                if(follower.getCurrentTValue() > 0.95 && auto.actionNotBusy()) {
                     auto.startBucket();
-                    auto.extend.toZero();
                     setPathState(7);
                 }
                 break;
             case 7:
-                if(!follower.isBusy() && auto.actionNotBusy()) {
-                    auto.extend.toZero();
-                    auto.intake.transfer();
-                    auto.intake.idle();
+                if(follower.getCurrentTValue() > 0.95 && auto.actionNotBusy()) {
+                    follower.followPath(grabPickup2,true);
                     setPathState(8);
                 }
                 break;
             case 8:
-                if(!follower.isBusy() && auto.actionNotBusy() && pathTimer.getElapsedTimeSeconds() > 1) {
+                if(follower.getCurrentTValue() > 0.99 && auto.actionNotBusy()) {
+                    auto.startIntake();
+                    setPathState(9);
+                }
+                break;
+            case 9:
+                if(follower.getCurrentTValue() > 0.95 && auto.actionNotBusy()) {
+                    auto.startTransfer();
+                    setPathState(10);
+                }
+                break;
+            case 10:
+                if(follower.getCurrentTValue() > 0.95 && auto.actionNotBusy()) {
+                    follower.followPath(scorePickup2,true);
+                    setPathState(11);
+                }
+                break;
+            case 11:
+                if(follower.getCurrentTValue() > 0.95 && auto.actionNotBusy()) {
+                    auto.startBucket();
+                    setPathState(12);
+                }
+                break;
+            case 12:
+                if(follower.getCurrentTValue() > 0.95 && auto.actionNotBusy()) {
+                    follower.followPath(grabPickup3,true);
+                    setPathState(13);
+                }
+                break;
+            case 13:
+                if(follower.getCurrentTValue() > 0.99 && auto.actionNotBusy()) {
+                    auto.startIntake();
+                    setPathState(14);
+                }
+                break;
+            case 14:
+                if(follower.getCurrentTValue() > 0.95 && auto.actionNotBusy()) {
+                    auto.startTransfer();
+                    setPathState(15);
+                }
+                break;
+            case 15:
+                if(follower.getCurrentTValue() > 0.95 && auto.actionNotBusy()) {
+                    follower.followPath(scorePickup3, true);
+                    setPathState(16);
+                }
+                break;
+            case 16:
+                if(follower.getCurrentTValue() > 0.95 && auto.actionNotBusy()) {
+                    auto.startBucket();
+                    setPathState(17);
+                }
+                break;
+            case 17:
+                if(follower.getCurrentTValue() > 0.95 && auto.actionNotBusy()) {
+                    follower.followPath(grabPickup4,true);
+                    setPathState(18);
+                }
+                break;
+            case 18:
+                if(follower.getCurrentTValue() > 0.99 && auto.actionNotBusy()) {
+                    auto.startSubPickUp();
+                    setPathState(19);
+                }
+                break;
+            case 19:
+                if(follower.getCurrentTValue() > 0.95 && auto.actionNotBusy()) {
+                    auto.startTransfer();
+                    setPathState(20);
+                }
+                break;
+            case 20:
+                if(follower.getCurrentTValue() > 0.95 && auto.actionNotBusy()) {
+                    follower.followPath(scorePickup3, true);
+                    setPathState(21);
+                }
+                break;
+            case 21:
+                if(follower.getCurrentTValue() > 0.95 && auto.actionNotBusy()) {
+                    auto.startBucket();
+                    setPathState(22);
+                }
+                break;
+            case 22:
+                if(follower.getCurrentTValue() > 0.95 && auto.actionNotBusy() && pathTimer.getElapsedTimeSeconds() > 1) {
                     setPathState(-1);
                 }
                 break;

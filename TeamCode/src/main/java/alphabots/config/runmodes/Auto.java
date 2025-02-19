@@ -44,8 +44,8 @@ public class Auto {
 
     public boolean actionBusy;
 
-    public Timer transferTimer = new Timer(), bucketTimer = new Timer(), chamberScoreTimer = new Timer(), intakeTimer = new Timer(), parkTimer = new Timer(), specimenTimer = new Timer();
-    public int transferState = -1, bucketState = -1, chamberScoreState = -1, intakeState = -1, parkState = -1, specimenState = -1;
+    public Timer transferTimer = new Timer(), bucketTimer = new Timer(), chamberScoreTimer = new Timer(), intakeTimer = new Timer(), parkTimer = new Timer(), specimenTimer = new Timer(), subPickUpTimer = new Timer();
+    public int transferState = -1, bucketState = -1, chamberScoreState = -1, intakeState = -1, parkState = -1, specimenState = -1, subPickUpState = -1;
 
     public Auto(HardwareMap hardwareMap, Telemetry telemetry) {
         outtake = new OuttakeSubsystem(hardwareMap, telemetry, outtakeGrabState, outtakeRotateState, outtakePivotState, outtakeSpinState);
@@ -79,9 +79,12 @@ public class Auto {
         bucket();
         specimen();
         chamberScore();
+        subPickUp();
         lift.updatePIDF();
         extend.updatePIDF();
         telemetryUpdate();
+        intake.prevent2sample();
+        intake.autoOuttake();
     }
 
     public void transfer() {
@@ -92,29 +95,30 @@ public class Auto {
                 lift.toZero();
                 outtake.idle();
                 outtake.open();
-                intake.transfer();
                 extend.toZero();
-                setTransferState(1);
                 transferTimer.resetTimer();
                 setTransferState(2);
                 break;
             case 2:
-                if (transferTimer.getElapsedTimeSeconds() > 0.35 && extend.getPos() < 30 && lift.getPos() < 30) {
-                    outtake.transfer();
-                    transferTimer.resetTimer();
-                    setTransferState(3);
-                }
+                setTransferState(3);
                 break;
             case 3:
-                if (transferTimer.getElapsedTimeSeconds() > 0.2) {
-                    outtake.close();
+                if (transferTimer.getElapsedTimeSeconds() > 0.3 && extend.getPos() < 10 && lift.getPos() < 30) {
+                    actionBusy = false;
+                    outtake.transfer();
                     transferTimer.resetTimer();
                     setTransferState(4);
                 }
+                break;
             case 4:
-                if (transferTimer.getElapsedTimeSeconds() > 0.35) {
+                if (transferTimer.getElapsedTimeSeconds() > 0.2) {
+                    outtake.close();
                     transferTimer.resetTimer();
-                    actionBusy = false;
+                    setTransferState(5);
+                }
+            case 5:
+                if (transferTimer.getElapsedTimeSeconds() > 0.2) {
+                    transferTimer.resetTimer();
                     setTransferState(-1);
                 }
                 break;
@@ -145,8 +149,8 @@ public class Auto {
                 break;
             case 2:
                 if (lift.getPos() > RobotConstants.liftToHighBucket - 300) {
-                    intake.ground();
                     intake.intake();
+                    extend.setTarget(200);
                     outtake.score();
                     outtake.close();
                     bucketTimer.resetTimer();
@@ -156,29 +160,29 @@ public class Auto {
             case 3:
                 if (lift.getPos() > RobotConstants.liftToHighBucket - 30) {
                     bucketTimer.resetTimer();
-                    setBucketState(35);
-                }
-            case 35:
-                if (bucketTimer.getElapsedTimeSeconds() > 0.2 ) {
-                    outtake.open();
-                    bucketTimer.resetTimer();
                     setBucketState(4);
                 }
             case 4:
-                if (bucketTimer.getElapsedTimeSeconds() > 0.2 ) {
-                    outtake.idle();
+                if (bucketTimer.getElapsedTimeSeconds() > 0.2) {
+                    outtake.open();
                     bucketTimer.resetTimer();
+                    actionBusy = false;
                     setBucketState(5);
                 }
             case 5:
-                if (bucketTimer.getElapsedTimeSeconds() > 0.2) {
-                    lift.toZero();
+                if (bucketTimer.getElapsedTimeSeconds() > 0.3 ) {
+                    outtake.idle();
                     bucketTimer.resetTimer();
                     setBucketState(6);
                 }
             case 6:
+                if (bucketTimer.getElapsedTimeSeconds() > 0.3) {
+                    lift.toZero();
+                    bucketTimer.resetTimer();
+                    setBucketState(7);
+                }
+            case 7:
                 if (lift.getPos() < 25) {
-                    actionBusy = false;
                     setBucketState(-1);
                 }
         }
@@ -292,6 +296,57 @@ public class Auto {
         }
     }
 
+    public void subPickUp() {
+        switch (subPickUpState) {
+            case 1:
+                actionBusy = true;
+                intake.swipeOpen();
+                intake.intake();
+                subPickUpTimer.resetTimer();
+                setSubPickUpState(2);
+                break;
+            case 2:
+                if (subPickUpTimer.getElapsedTimeSeconds() > 0.15) {
+                    intake.ground();
+                    subPickUpTimer.resetTimer();
+                    setSubPickUpState(3);
+                }
+                break;
+            case 3:
+                if (subPickUpTimer.getElapsedTimeSeconds() > 0.2) {
+                    extend.addToTarget(325);
+                    subPickUpTimer.resetTimer();
+                    setSubPickUpState(4);
+                }
+                break;
+            case 4:
+                if (subPickUpTimer.getElapsedTimeSeconds() > 1) {
+                    actionBusy = false;
+                    intake.idle();
+                    intake.intake();
+                    extend.toZero();
+                    intake.transfer();
+                    subPickUpTimer.resetTimer();
+                    setSubPickUpState(5);
+                }
+                break;
+            case 5:
+                if (intakeTimer.getElapsedTimeSeconds() > 0.4 && extend.getPos() < 15) {
+                    setSubPickUpState(-1);
+                }
+                break;
+        }
+    }
+
+    public void setSubPickUpState(int x) {
+        subPickUpState = x;
+    }
+    public void startSubPickUp() {
+        if (actionNotBusy()) {
+            setSubPickUpState(1);
+        }
+    }
+
 
 /*
     public void chamberScore() {
@@ -365,44 +420,42 @@ public class Auto {
         switch (intakeState) {
             case 1:
                 actionBusy = true;
-                intake.intake();
-                intake.ground();
-                intakeTimer.resetTimer();
                 setIntakeState(2);
                 break;
             case 2:
-                if(intakeTimer.getElapsedTimeSeconds() > 0) {
-                    extend.setTarget(300);
+                if(intakeTimer.getElapsedTimeSeconds() > 1.6) {
+                    intake.intake();
+                    intake.ground();
                     intakeTimer.resetTimer();
-                    setIntakeState(10);
-                }
-                break;
-            case 10:
-                if(700 - extend.getPos() < 30) {
-                    intakeTimer.resetTimer();
-                    setIntakeState(11);
-                }
-                break;
-            case 11:
-                if(intakeTimer.getElapsedTimeSeconds() > 0.2) {
-                    extend.addToTarget(150);
+                    extend.setTarget(410);
                     intakeTimer.resetTimer();
                     setIntakeState(3);
                 }
                 break;
             case 3:
-                if (intakeTimer.getElapsedTimeSeconds() > 0.8) {
-                    intake.idle();
-                    intake.intake();
-                    extend.toZero();
-                    intake.transfer();
+                if(extend.getTarget() - extend.getPos() < 50) {
                     intakeTimer.resetTimer();
                     setIntakeState(4);
                 }
                 break;
             case 4:
-                if (intakeTimer.getElapsedTimeSeconds() > 0.4 && extend.getPos() < 15) {
+                if(intakeTimer.getElapsedTimeSeconds() > 0) {
+                    setIntakeState(5);
+                }
+                break;
+            case 5:
+                if (intakeTimer.getElapsedTimeSeconds() > 0.6) {
+                    intake.idle();
+                    intake.intake();
+                    extend.toZero();
+                    intake.transfer();
                     actionBusy = false;
+                    intakeTimer.resetTimer();
+                    setIntakeState(6);
+                }
+                break;
+            case 6:
+                if (intakeTimer.getElapsedTimeSeconds() > 0.4 && extend.getPos() < 15) {
                     setIntakeState(-1);
                 }
                 break;

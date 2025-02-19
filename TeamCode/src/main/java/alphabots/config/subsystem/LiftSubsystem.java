@@ -6,22 +6,23 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.pedropathing.util.Timer;
-import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 import alphabots.config.util.RobotConstants;
 import alphabots.config.util.action.RunAction;
 
 public class LiftSubsystem {
     private Telemetry telemetry;
-    public DcMotor rightLift, leftLift;
+    public DcMotorEx rightLift, leftLift;
     public boolean hang = false;
     public int pos, bottom;
     public RunAction toZero, toHighBucket, toHighChamber, toHumanPlayer, toTransfer, toPark;
     public PIDController liftPID;
     public static int target;
-    public static double p = 0.05, i = 0.0005, d = 0.00001;
+    public static double p = 0.012, i = 0, d = 0.0001;
     public static double f = 0.15;
 
 
@@ -29,43 +30,33 @@ public class LiftSubsystem {
         this.telemetry = telemetry;
         this.telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        rightLift = hardwareMap.get(DcMotor.class, "bottomLift");
-        leftLift = hardwareMap.get(DcMotor.class, "topLift");
+        rightLift = hardwareMap.get(DcMotorEx.class, "bottomLift");
+        leftLift = hardwareMap.get(DcMotorEx.class, "topLift");
         //day b4 comp add variable storage
-        rightLift.setDirection(DcMotor.Direction.FORWARD);
-        leftLift.setDirection(DcMotor.Direction.REVERSE);
-        leftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightLift.setDirection(DcMotorEx.Direction.FORWARD);
+        leftLift.setDirection(DcMotorEx.Direction.REVERSE);
+        leftLift.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        rightLift.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        rightLift.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        leftLift.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
 
 
         liftPID = new PIDController(p, i, d);
     }
 
     public void updatePIDF(){
-            if (getTarget() == liftToZero && getPos() < 1) {
-                leftLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                rightLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-                leftLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                rightLift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                leftLift.setPower(0);
-                rightLift.setPower(0);
-            }else {
                 liftPID.setPID(p, i, d);
 
-                rightLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                leftLift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                rightLift.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+                leftLift.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
 
                 double pid = liftPID.calculate(getPos(), target);
                 double ticks_in_degrees = 537.7 / 360.0;
                 double ff = Math.cos(Math.toRadians(target / ticks_in_degrees)) * f;
                 double power = pid + ff;
-                power = Math.max(power,-0.5);
+                power = Math.max(power,-0.8);
                 leftLift.setPower(power);
                 rightLift.setPower(power);
-            }
     }
 
 
@@ -126,6 +117,8 @@ public class LiftSubsystem {
     public void telemetry() {
         telemetry.addData("Lift Pos: ", getPos());
         telemetry.addData("Lift Target: ", target);
+        telemetry.addData("current draw",leftLift.getCurrent(CurrentUnit.AMPS));
+        telemetry.addData("current draw",rightLift.getCurrent(CurrentUnit.AMPS));
     }
 
 }

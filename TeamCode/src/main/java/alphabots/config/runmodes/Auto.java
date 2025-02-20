@@ -314,7 +314,7 @@ public class Auto {
                 break;
             case 3:
                 if (subPickUpTimer.getElapsedTimeSeconds() > 0.2) {
-                    extend.addToTarget(325);
+                    extend.addToTarget(210);
                     subPickUpTimer.resetTimer();
                     setSubPickUpState(4);
                 }

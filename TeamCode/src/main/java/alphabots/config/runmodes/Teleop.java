@@ -46,9 +46,9 @@ public class Teleop {
     private OuttakeSubsystem.RotateState outtakeRotateState;
     private OuttakeSubsystem.SpinState outtakeSpinState;
 
-    private Timer transferTimer = new Timer(), wiperTimer = new Timer(), sampleTimer = new Timer(), resetTimer = new Timer(), intakeTimer = new Timer(), specimenGrabTimer = new Timer();
+    private Timer transferTimer = new Timer(), wiperTimer = new Timer(), sampleTimer = new Timer(), resetTimer = new Timer(), intakeTimer = new Timer(), specimenGrabTimer = new Timer(), specimenScoreTimer = new Timer();
 
-    private int transferState = -1, wiperState = -1, sampleState = -1, resetState = -1, intakeState = -1, specimenGrabState = -1;
+    private int transferState = -1, wiperState = -1, sampleState = -1, resetState = -1, intakeState = -1, specimenGrabState = -1, specimenScoreState = -1;
 
 
     private Telemetry telemetry;
@@ -136,7 +136,6 @@ public class Teleop {
         if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper && mode.equals("intake")) {
             startTransfer();
         }
-
         if (currentGamepad1.left_trigger > 0.1 && mode.equals("intake")) {
             extend.toZero();
             outtake.idle();
@@ -156,9 +155,7 @@ public class Teleop {
         if (currentGamepad1.dpad_left && !previousGamepad1.dpad_left && mode.equals("intake")) {
             intake.swipeOpen();
         }
-        if (currentGamepad1.dpad_right && !previousGamepad1.dpad_right && mode.equals("intake")) {
-            intake.swipeOpen();
-        }
+
         if (currentGamepad1.dpad_up && !previousGamepad1.dpad_up && mode.equals("intake")) {
             startwiper();
         }
@@ -166,16 +163,26 @@ public class Teleop {
             intake.switchIntakeState();
         }
 
-
-        // if(currentGamepad1.dpad_right && !previousGamepad1.dpad_right){
-        // mode = "specimen";
-        // }
         if (currentGamepad1.cross && !previousGamepad1.cross && mode.equals("intake")) {
             startReset();
         }
         if (currentGamepad1.triangle && !previousGamepad1.triangle && mode.equals("intake")) {
             startSample();
         }
+        if(currentGamepad1.dpad_right && !previousGamepad1.dpad_right && mode.equals("intake")){
+            mode= "specimen";
+        }
+        if(currentGamepad1.left_bumper && !previousGamepad1.left_bumper && mode.equals("specimen")){
+            startSpecimenGrab();
+        }
+        if(currentGamepad1.right_bumper && !previousGamepad1.right_bumper && mode.equals("specimen")){
+            startSpecimenScore();
+        }
+
+        if(currentGamepad1.dpad_right && !previousGamepad1.dpad_right && mode.equals("specimen")){
+            mode = "intake";
+        }
+
 
         lift.updatePIDF();
         extend.updatePIDF();
@@ -183,6 +190,8 @@ public class Teleop {
         sample();
         wiper();
         reset();
+        specimenGrab();
+        specimenScore();
         moveDriveTrain();
         intake.prevent2sample();
         intake.autoOuttake();
@@ -213,6 +222,60 @@ public class Teleop {
 
     public void startSpecimenGrab() {
         setSpecimenGrabState(0);
+    }
+
+    private void specimenGrab() {
+        switch (specimenGrabState) {
+            case 0:
+                lift.toZero();
+                outtake.setRotateState(OuttakeSubsystem.RotateState.SPECIMENGRAB);
+                outtake.setPivotState(OuttakeSubsystem.PivotState.SPECIMENGRAB);
+                telemetry.addLine("started 1");
+                setSpecimenGrabState(1);
+                break;
+            case 1:
+                if (specimenGrabTimer.getElapsedTimeSeconds() > 0.35) {
+                    outtake.open();
+                    telemetry.addLine("started 2");
+                    setSpecimenGrabState(-1);
+                }
+
+                break;
+        }
+    }
+
+    public void setSpecimenScoreState(int x) {
+        specimenScoreState = x;
+        specimenScoreTimer.resetTimer();
+    }
+
+    public void startSpecimenScore() {
+        setSpecimenScoreState(0);
+    }
+
+    private void specimenScore() {
+        switch (specimenScoreState) {
+            case 0:
+                outtake.close();
+                telemetry.addLine("started 1");
+                setSpecimenScoreState(1);
+                break;
+            case 1:
+                if (specimenScoreTimer.getElapsedTimeSeconds() > 0.35) {
+                    lift.toHighChamber();
+                    telemetry.addLine("started 2");
+                    setSpecimenScoreState(2);
+                }
+            case 2:
+                if (specimenScoreTimer.getElapsedTimeSeconds() > 0.35) {
+                    outtake.setRotateState(OuttakeSubsystem.RotateState.SPECIMENSCORE);
+                    outtake.setPivotState(OuttakeSubsystem.PivotState.SPECIMENSCORE);
+                    telemetry.addLine("started 3");
+                    setSpecimenScoreState(-1);
+                }
+
+                break;
+        }
     }
 
     private void transfer() {

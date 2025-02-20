@@ -55,7 +55,7 @@ public class ExtendSubsystem {
     }
 
     public void toHalf() {
-        setTarget(400);
+        setTarget(200);
     }
 
     public void toFull() {

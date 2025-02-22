@@ -91,6 +91,7 @@ public class Auto {
         switch (transferState) {
             case 1:
                 actionBusy = true;
+                intake.swipeClose();
                 intake.transfer();
                 lift.toZero();
                 outtake.idle();
@@ -151,6 +152,7 @@ public class Auto {
                 if (lift.getPos() > RobotConstants.liftToHighBucket - 300) {
                     intake.intake();
                     extend.setTarget(200);
+                    intake.ground();
                     outtake.score();
                     outtake.close();
                     bucketTimer.resetTimer();
@@ -300,6 +302,7 @@ public class Auto {
         switch (subPickUpState) {
             case 1:
                 actionBusy = true;
+                extend.setTarget(80);
                 intake.swipeOpen();
                 intake.intake();
                 subPickUpTimer.resetTimer();
@@ -307,19 +310,33 @@ public class Auto {
                 break;
             case 2:
                 if (subPickUpTimer.getElapsedTimeSeconds() > 0.15) {
-                    intake.ground();
+                    intake.swipeClose();
                     subPickUpTimer.resetTimer();
                     setSubPickUpState(3);
                 }
                 break;
             case 3:
-                if (subPickUpTimer.getElapsedTimeSeconds() > 0.2) {
-                    extend.addToTarget(210);
+                if (subPickUpTimer.getElapsedTimeSeconds() > 0.15) {
+                    intake.swipeOpen();
                     subPickUpTimer.resetTimer();
                     setSubPickUpState(4);
                 }
                 break;
             case 4:
+                if (subPickUpTimer.getElapsedTimeSeconds() > 0.15) {
+                    intake.ground();
+                    subPickUpTimer.resetTimer();
+                    setSubPickUpState(5);
+                }
+                break;
+            case 5:
+                if (subPickUpTimer.getElapsedTimeSeconds() > 0.2) {
+                    extend.addToTarget(210);
+                    subPickUpTimer.resetTimer();
+                    setSubPickUpState(6);
+                }
+                break;
+            case 6:
                 if (subPickUpTimer.getElapsedTimeSeconds() > 1) {
                     actionBusy = false;
                     intake.idle();
@@ -327,10 +344,10 @@ public class Auto {
                     extend.toZero();
                     intake.transfer();
                     subPickUpTimer.resetTimer();
-                    setSubPickUpState(5);
+                    setSubPickUpState(7);
                 }
                 break;
-            case 5:
+            case 7:
                 if (intakeTimer.getElapsedTimeSeconds() > 0.4 && extend.getPos() < 15) {
                     setSubPickUpState(-1);
                 }
@@ -427,7 +444,7 @@ public class Auto {
                     intake.intake();
                     intake.ground();
                     intakeTimer.resetTimer();
-                    extend.setTarget(410);
+                    extend.setTarget(400);
                     intakeTimer.resetTimer();
                     setIntakeState(3);
                 }

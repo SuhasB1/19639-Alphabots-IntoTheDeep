@@ -31,7 +31,9 @@ public class IntakeSubsystem { //STILL NEED TO CODE WIPER
     public Timer autoTimer = new Timer();
     public Timer intakedTimer = new Timer();
     private Telemetry telemetry;
-    private boolean isOuttaking = false;
+    private boolean isOuttaking1 = false;
+    private boolean isOuttaking2 = false;
+    Boolean detectedElement = false;
     private double outtakeStartTime = 0;
 
     private double intakedStartTime = 0;
@@ -143,41 +145,44 @@ public class IntakeSubsystem { //STILL NEED TO CODE WIPER
     public void autoOuttake() {
         if (VariableStorage.currentTeam == VariableStorage.Team.RED) {
             if (pin0.getState() && !pin1.getState()) {
-                if (!isOuttaking) {
+                if (!isOuttaking2) {
+                    detectedElement = false;
                     outtake();
                     outtakeStartTime = autoTimer.getElapsedTimeSeconds();
-                    isOuttaking = true;
+                    isOuttaking2 = true;
                 }
             }
         } else if (VariableStorage.currentTeam == VariableStorage.Team.BLUE) {
             if (!pin0.getState() && pin1.getState()) {
-                if (!isOuttaking) {
+                if (!isOuttaking2) {
+                    detectedElement = false;
                     outtake();
                     outtakeStartTime = autoTimer.getElapsedTimeSeconds();
-                    isOuttaking = true;
+                    isOuttaking2 = true;
                 }
             }
         }
 
 
-        if (isOuttaking && (autoTimer.getElapsedTimeSeconds() - outtakeStartTime) > 1.0) {
+        if (isOuttaking2 && (autoTimer.getElapsedTimeSeconds() - outtakeStartTime) > 1.0) {
             idle();
-            isOuttaking = false;
+            changeDetectedElement();
+            isOuttaking2 = false;
         }
     }
 
     public void prevent2sample() {
         if (pivotState == PivotState.TRANSFER){
             if(detected()) {
-                if(!isOuttaking) {
+                if(!isOuttaking1) {
                     outtake();
                     intakedStartTime = intakedTimer.getElapsedTimeSeconds();
-                    isOuttaking = true;
+                    isOuttaking1 = true;
                 }
             }
             if (intakedTimer.getElapsedTimeSeconds() - intakedStartTime > 1.5) {
                 idle();
-                isOuttaking = false;
+                isOuttaking1 = false;
             }
         }
     }
@@ -186,9 +191,24 @@ public class IntakeSubsystem { //STILL NEED TO CODE WIPER
         if (!pin0.getState() && !pin1.getState()) {
             return false;
         }else {
+            detectedElement = true;
             return true;
         }
 
+    }
+    public boolean checkDetectedElement(){
+        if(detectedElement){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    public void changeDetectedElement(){
+        if(detectedElement){
+            detectedElement = false;
+        }else{
+            detectedElement = true;
+        }
     }
 
     public void telemetry() {

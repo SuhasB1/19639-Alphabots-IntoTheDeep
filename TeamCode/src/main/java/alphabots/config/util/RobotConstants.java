@@ -6,8 +6,8 @@ import com.acmerobotics.dashboard.config.Config;
 public class RobotConstants {
 
     // Outtake
-    public static double outtakeGrabClose = 0.4; ///
-    public static double outtakeGrabOpen = 0.15; ///
+    public static double outtakeGrabClose = 0.96; ///
+    public static double outtakeGrabOpen = 0.78; ///
     public static double outtakeRotateTransfer = 0.76; ///
     public static double outtakeRotateSpecimenGrab = 0.53; ///
     public static double outtakeRotateScore = 0.35; ///
@@ -26,8 +26,8 @@ public class RobotConstants {
     public static double intakeBoxIntake = 1; //
     public static double intakeBoxIdle = 0; //
     public static double intakeBoxOuttake = -1; //
-    public static double intakePivotTransfer= 0.4; //
-    public static double intakePivotGround = 0.82; //
+    public static double intakePivotTransfer= 0.38; //
+    public static double intakePivotGround = 0.8125; //
     public static double intakePivotHover = 0.8; //
     public static double intakeWiperOpen = 0.3; //
     public static double intakeWiperClose = 0.985; //
@@ -42,7 +42,7 @@ public class RobotConstants {
 
     // Extend Positions
     public static int extendManualIncrements = 70;
-    public static int extendZero = -15;
+    public static int extendZero = -8;
     public static int extendFullSample = 420;
     public static int extendFullSpecimen = 420;
 

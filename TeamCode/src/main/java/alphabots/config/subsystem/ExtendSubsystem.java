@@ -18,7 +18,7 @@ public class ExtendSubsystem {
     public int extendLimit = extendFullSample;
     public PIDController extendPID;
     public static int target = 0;
-    public static double p = 0.011, i = 0, d = 0;
+    public static double p = 0.025, i = 0, d = 0;
     public ExtendSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
         this.telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -37,7 +37,7 @@ public class ExtendSubsystem {
             extend.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
             double pid = extendPID.calculate(getPos(), target);
             double power = pid;
-            power = Math.max(power, -0.9);
+            power = Math.max(power, -0.8);
             extend.setPower(power);
     }
 

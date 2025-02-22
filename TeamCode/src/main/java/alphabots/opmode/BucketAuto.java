@@ -27,10 +27,10 @@ public class BucketAuto extends OpMode {
 
     private final Pose score1Pose = new Pose(17.5, 127, Math.toRadians(322));
 
-    private final Pose score2Pose = new Pose(17, 127, Math.toRadians(322));
-    private final Pose score3Pose = new Pose(16.5, 127, Math.toRadians(322));
-    private final Pose score4Pose = new Pose(16.5, 127, Math.toRadians(322));
-    private final Pose score5Pose = new Pose(16.5, 127, Math.toRadians(322));
+    private final Pose score2Pose = new Pose(17.5, 127, Math.toRadians(322));
+    private final Pose score3Pose = new Pose(17.5, 127, Math.toRadians(322));
+    private final Pose score4Pose = new Pose(17.5, 127, Math.toRadians(322));
+    private final Pose score5Pose = new Pose(17.5, 127, Math.toRadians(322));
 
 
     private final Pose pickup1Pose = new Pose(24.5, 119.2, Math.toRadians(0));
@@ -39,11 +39,12 @@ public class BucketAuto extends OpMode {
 
     private final Pose pickup3Pose = new Pose(32.5, 126, Math.toRadians(35));
 
-    private final Pose pickup4Pose = new Pose(32.5, 126, Math.toRadians(35));
+    private final Pose pickup4Pose = new Pose(68, 95, Math.toRadians(270));
+    private final Pose pickup4ControlPose = new Pose(57, 135);
 
     private final Pose parkPose = new Pose(63, 95, Math.toRadians(90));
 
-    private final Pose parkControlPose = new Pose(50, 150, Math.toRadians(90));
+    private final Pose parkControlPose = new Pose(50, 145, Math.toRadians(90));
 
     private Path scorePreload, park;
     private PathChain grabPickup1, grabPickup2, grabPickup3, grabPickup4, scorePickup1, scorePickup2, scorePickup3, scorePickup4;
@@ -83,7 +84,7 @@ public class BucketAuto extends OpMode {
                 .build();
 
         grabPickup4 = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(score4Pose), new Point(pickup4Pose)))
+                .addPath(new BezierCurve(new Point(score4Pose), new Point(pickup4ControlPose), new Point(pickup4Pose)))
                 .setLinearHeadingInterpolation(score4Pose.getHeading(), pickup4Pose.getHeading())
                 .build();
 
@@ -202,6 +203,7 @@ public class BucketAuto extends OpMode {
             case 17:
                 if(follower.getCurrentTValue() > 0.95 && auto.actionNotBusy()) {
                     follower.followPath(grabPickup4,true);
+                    auto.intake.transfer();
                     setPathState(18);
                 }
                 break;
@@ -213,6 +215,7 @@ public class BucketAuto extends OpMode {
                 break;
             case 19:
                 if(follower.getCurrentTValue() > 0.95 && auto.actionNotBusy()) {
+                    auto.intake.swipeClose();
                     auto.startTransfer();
                     setPathState(20);
                 }
@@ -230,7 +233,9 @@ public class BucketAuto extends OpMode {
                 }
                 break;
             case 22:
-                if(follower.getCurrentTValue() > 0.95 && auto.actionNotBusy() && pathTimer.getElapsedTimeSeconds() > 1) {
+                if(follower.getCurrentTValue() > 0.95 && auto.actionNotBusy()) {
+                    auto.extend.toZero();
+                    auto.intake.transfer();
                     setPathState(-1);
                 }
                 break;

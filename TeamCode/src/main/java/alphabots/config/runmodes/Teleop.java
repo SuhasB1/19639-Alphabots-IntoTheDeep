@@ -258,8 +258,17 @@ public class Teleop {
                 if (specimenGrabTimer.getElapsedTimeSeconds() > 0.35) {
                     lift.toZero();
                     outtake.setRotateState(OuttakeSubsystem.RotateState.SPECIMENGRAB);
-                    outtake.setPivotState(OuttakeSubsystem.PivotState.SPECIMENGRAB);
+                    outtake.leftPivot.setPosition(RobotConstants.outtakePivotSpecimenGrab + 3);
+                    outtake.rightPivot.setPosition(RobotConstants.outtakePivotSpecimenGrab + 3);
                     telemetry.addLine("started 2");
+                    setSpecimenGrabState(2);
+                }
+
+                break;
+            case 2:
+                if (specimenGrabTimer.getElapsedTimeSeconds() > 0.15) {
+                    outtake.setPivotState(OuttakeSubsystem.PivotState.SPECIMENGRAB);
+                    telemetry.addLine("started 3");
                     setSpecimenGrabState(-1);
                 }
 

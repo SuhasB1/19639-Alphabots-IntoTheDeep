@@ -129,10 +129,10 @@ public class OuttakeSubsystem {
     }
 
     public void idle() {
+        grab.setPosition(RobotConstants.outtakeGrabOpen);
         rotate.setPosition(RobotConstants.outtakeRotateIdle);
         leftPivot.setPosition(RobotConstants.outtakePivotIdle);
         rightPivot.setPosition(RobotConstants.outtakePivotIdle);
-        grab.setPosition(RobotConstants.outtakeGrabOpen);
         spin.setPosition(RobotConstants.outtakeSpinForward);
 
     }

@@ -55,8 +55,8 @@ public class Auto {
     public boolean actionBusy;
 
 
-    public Timer transferTimer = new Timer(), bucketTimer = new Timer(), chamberScoreTimer = new Timer(), intakeTimer = new Timer(), parkTimer = new Timer(), specimenTimer = new Timer(), subPickUpTimer = new Timer(), specimenScoreTimer = new Timer();
-    public int transferState = -1, bucketState = -1, chamberScoreState = -1, intakeState = -1, parkState = -1, specimenState = -1, subPickUpState = -1, specimenScoreState = -1;
+    public Timer transferTimer = new Timer(), bucketTimer = new Timer(), chamberScoreTimer = new Timer(), intakeTimer = new Timer(), parkTimer = new Timer(), specimenTimer = new Timer(), subPickUpTimer = new Timer(), specimenScoreTimer = new Timer(), specimenGrabTimer = new Timer();
+    public int transferState = -1, bucketState = -1, chamberScoreState = -1, intakeState = -1, parkState = -1, specimenState = -1, subPickUpState = -1, specimenScoreState = -1, specimenGrabState = -1;
 
 
     public Auto(HardwareMap hardwareMap, Telemetry telemetry) {
@@ -97,6 +97,7 @@ public class Auto {
         pick();
         bucket();
         specimenScore();
+        specimenGrab();
         chamberScore();
         subPickUp();
         lift.updatePIDF();
@@ -153,15 +154,41 @@ public class Auto {
 
 
 
-
-
-
     public void startTransfer() {
         if (actionNotBusy()) {
             setTransferState(1);
         }
     }
 
+
+    public void setSpecimenGrabState(int x) {
+        specimenGrabState = x;
+        specimenGrabTimer.resetTimer();
+    }
+
+    public void startSpecimenGrab() {
+        setSpecimenGrabState(0);
+    }
+
+    private void specimenGrab() {
+        switch (specimenGrabState) {
+            case 0:
+                outtake.open();
+                telemetry.addLine("started 1");
+                setSpecimenGrabState(1);
+                break;
+            case 1:
+                if (specimenGrabTimer.getElapsedTimeSeconds() > 0.35) {
+                    lift.toZero();
+                    outtake.setRotateState(OuttakeSubsystem.RotateState.SPECIMENGRAB);
+                    outtake.setPivotState(OuttakeSubsystem.PivotState.SPECIMENGRAB);
+                    telemetry.addLine("started 2");
+                    setSpecimenGrabState(-1);
+                }
+
+                break;
+        }
+    }
 
     public void bucket() {
         switch (bucketState) {

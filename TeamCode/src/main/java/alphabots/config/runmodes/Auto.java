@@ -487,7 +487,7 @@ public class Auto {
                 setIntakeState(2);
                 break;
             case 2:
-                if(intakeTimer.getElapsedTimeSeconds() > 1.6) {
+                if(intakeTimer.getElapsedTimeSeconds() > 3.2) {
                     intake.intake();
                     intake.ground();
                     intakeTimer.resetTimer();

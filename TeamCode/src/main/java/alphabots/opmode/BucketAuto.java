@@ -33,7 +33,7 @@ public class BucketAuto extends OpMode {
     private final Pose score5Pose = new Pose(17.5, 127, Math.toRadians(322));
 
 
-    private final Pose pickup1Pose = new Pose(25.5, 119.2, Math.toRadians(0));
+    private final Pose pickup1Pose = new Pose(25.5, 120.2, Math.toRadians(0));
 
     private final Pose pickup2Pose = new Pose(25.25, 128.7, Math.toRadians(0));
 

@@ -324,19 +324,26 @@ public class Auto {
                 break;
             case 4:
                 if (subPickUpTimer.getElapsedTimeSeconds() > 0.15) {
-                    intake.ground();
+                    intake.swipeClose();
                     subPickUpTimer.resetTimer();
                     setSubPickUpState(5);
                 }
                 break;
             case 5:
-                if (subPickUpTimer.getElapsedTimeSeconds() > 0.2) {
-                    extend.addToTarget(210);
+                if (subPickUpTimer.getElapsedTimeSeconds() > 0.15) {
+                    intake.ground();
                     subPickUpTimer.resetTimer();
                     setSubPickUpState(6);
                 }
                 break;
             case 6:
+                if (subPickUpTimer.getElapsedTimeSeconds() > 0.2) {
+                    extend.addToTarget(210);
+                    subPickUpTimer.resetTimer();
+                    setSubPickUpState(7);
+                }
+                break;
+            case 7:
                 if (subPickUpTimer.getElapsedTimeSeconds() > 1) {
                     actionBusy = false;
                     intake.idle();
@@ -344,10 +351,10 @@ public class Auto {
                     extend.toZero();
                     intake.transfer();
                     subPickUpTimer.resetTimer();
-                    setSubPickUpState(7);
+                    setSubPickUpState(8);
                 }
                 break;
-            case 7:
+            case 8:
                 if (intakeTimer.getElapsedTimeSeconds() > 0.4 && extend.getPos() < 15) {
                     setSubPickUpState(-1);
                 }
@@ -440,7 +447,7 @@ public class Auto {
                 setIntakeState(2);
                 break;
             case 2:
-                if(intakeTimer.getElapsedTimeSeconds() > 1.6) {
+                if(intakeTimer.getElapsedTimeSeconds() > 2.5) {
                     intake.intake();
                     intake.ground();
                     intakeTimer.resetTimer();

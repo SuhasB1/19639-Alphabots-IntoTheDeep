@@ -133,6 +133,9 @@ public class Teleop {
         if (currentGamepad1.dpad_up && !previousGamepad1.dpad_up && mode.equals("intake")) {
             startwiper();
         }
+        if (currentGamepad1.dpad_down && !previousGamepad1.dpad_down && mode.equals("intake")) {
+            startwiper();
+        }
         if (currentGamepad1.right_bumper && !previousGamepad1.right_bumper && mode.equals("intake")) {
             intake.intake();
             intake.ground();
@@ -169,9 +172,11 @@ public class Teleop {
 
         if (currentGamepad1.cross && !previousGamepad1.cross && mode.equals("intake")) {
             startReset();
+            speed = 1;
         }
         if (currentGamepad1.triangle && !previousGamepad1.triangle && mode.equals("intake")) {
             startSample();
+            speed = 0.5;
         }
         if(currentGamepad1.dpad_left && !previousGamepad1.dpad_left && mode.equals("intake")){
             mode= "specimen";

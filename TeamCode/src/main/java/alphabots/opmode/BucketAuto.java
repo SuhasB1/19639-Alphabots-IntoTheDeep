@@ -33,9 +33,9 @@ public class BucketAuto extends OpMode {
     private final Pose score5Pose = new Pose(17.5, 127, Math.toRadians(322));
 
 
-    private final Pose pickup1Pose = new Pose(24.5, 119.2, Math.toRadians(0));
+    private final Pose pickup1Pose = new Pose(25.5, 119.2, Math.toRadians(0));
 
-    private final Pose pickup2Pose = new Pose(24, 128.7, Math.toRadians(0));
+    private final Pose pickup2Pose = new Pose(25.25, 128.7, Math.toRadians(0));
 
     private final Pose pickup3Pose = new Pose(32.5, 126, Math.toRadians(35));
 
@@ -202,37 +202,44 @@ public class BucketAuto extends OpMode {
                 break;
             case 17:
                 if(follower.getCurrentTValue() > 0.95 && auto.actionNotBusy()) {
+                    auto.intake.swipeOpen();
                     follower.followPath(grabPickup4,true);
                     auto.intake.transfer();
                     setPathState(18);
                 }
                 break;
             case 18:
-                if(follower.getCurrentTValue() > 0.99 && auto.actionNotBusy()) {
-                    auto.startSubPickUp();
+                if(follower.getCurrentTValue() > 0.65) {
+                    auto.intake.swipeClose();
                     setPathState(19);
                 }
                 break;
             case 19:
-                if(follower.getCurrentTValue() > 0.95 && auto.actionNotBusy()) {
-                    auto.intake.swipeClose();
-                    auto.startTransfer();
+                if(follower.getCurrentTValue() > 0.99 && auto.actionNotBusy()) {
+                    auto.startSubPickUp();
                     setPathState(20);
                 }
                 break;
             case 20:
                 if(follower.getCurrentTValue() > 0.95 && auto.actionNotBusy()) {
-                    follower.followPath(scorePickup3, true);
+                    auto.intake.swipeClose();
+                    auto.startTransfer();
                     setPathState(21);
                 }
                 break;
             case 21:
                 if(follower.getCurrentTValue() > 0.95 && auto.actionNotBusy()) {
-                    auto.startBucket();
+                    follower.followPath(scorePickup3, true);
                     setPathState(22);
                 }
                 break;
             case 22:
+                if(follower.getCurrentTValue() > 0.95 && auto.actionNotBusy()) {
+                    auto.startBucket();
+                    setPathState(23);
+                }
+                break;
+            case 23:
                 if(follower.getCurrentTValue() > 0.95 && auto.actionNotBusy()) {
                     auto.extend.toZero();
                     auto.intake.transfer();

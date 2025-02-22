@@ -250,15 +250,15 @@ public class Teleop {
     private void specimenGrab() {
         switch (specimenGrabState) {
             case 0:
-                lift.toZero();
-                outtake.setRotateState(OuttakeSubsystem.RotateState.SPECIMENGRAB);
-                outtake.setPivotState(OuttakeSubsystem.PivotState.SPECIMENGRAB);
+                outtake.open();
                 telemetry.addLine("started 1");
                 setSpecimenGrabState(1);
                 break;
             case 1:
                 if (specimenGrabTimer.getElapsedTimeSeconds() > 0.35) {
-                    outtake.open();
+                    lift.toZero();
+                    outtake.setRotateState(OuttakeSubsystem.RotateState.SPECIMENGRAB);
+                    outtake.setPivotState(OuttakeSubsystem.PivotState.SPECIMENGRAB);
                     telemetry.addLine("started 2");
                     setSpecimenGrabState(-1);
                 }

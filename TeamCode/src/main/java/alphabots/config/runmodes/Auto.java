@@ -1,6 +1,8 @@
 package alphabots.config.runmodes;
 
+
 import static alphabots.config.util.FieldConstants.*;
+
 
 import com.pedropathing.util.Constants;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -16,6 +18,7 @@ import alphabots.config.util.VariableStorage;
 import alphabots.pedroPathing.constants.FConstants;
 import alphabots.pedroPathing.constants.LConstants;
 
+
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.pedropathing.pathgen.BezierLine;
@@ -24,7 +27,9 @@ import com.pedropathing.pathgen.PathChain;
 import com.pedropathing.pathgen.Point;
 import com.pedropathing.util.Timer;
 
+
 public class Auto {
+
 
     public IntakeSubsystem intake;
     private IntakeSubsystem.IntakeState intakeBoxState;
@@ -36,16 +41,23 @@ public class Auto {
     private OuttakeSubsystem.SpinState outtakeSpinState;
 
 
+
+
     public LiftSubsystem lift;
     public ExtendSubsystem extend;
 
 
+
+
     public Telemetry telemetry;
+
 
     public boolean actionBusy;
 
-    public Timer transferTimer = new Timer(), bucketTimer = new Timer(), chamberScoreTimer = new Timer(), intakeTimer = new Timer(), parkTimer = new Timer(), specimenTimer = new Timer(), subPickUpTimer = new Timer();
-    public int transferState = -1, bucketState = -1, chamberScoreState = -1, intakeState = -1, parkState = -1, specimenState = -1, subPickUpState = -1;
+
+    public Timer transferTimer = new Timer(), bucketTimer = new Timer(), chamberScoreTimer = new Timer(), intakeTimer = new Timer(), parkTimer = new Timer(), specimenTimer = new Timer(), subPickUpTimer = new Timer(), specimenScoreTimer = new Timer();
+    public int transferState = -1, bucketState = -1, chamberScoreState = -1, intakeState = -1, parkState = -1, specimenState = -1, subPickUpState = -1, specimenScoreState = -1;
+
 
     public Auto(HardwareMap hardwareMap, Telemetry telemetry) {
         outtake = new OuttakeSubsystem(hardwareMap, telemetry, outtakeGrabState, outtakeRotateState, outtakePivotState, outtakeSpinState);
@@ -53,10 +65,13 @@ public class Auto {
         extend = new ExtendSubsystem(hardwareMap, telemetry);
         intake = new IntakeSubsystem(hardwareMap, telemetry, intakeBoxState, intakePivotState);
 
+
         this.telemetry = telemetry;
+
 
         init();
     }
+
 
     public void init() {
         telemetryUpdate();
@@ -64,20 +79,24 @@ public class Auto {
         intake.start();
     }
 
+
     public void start() {
 
+
     }
+
 
     public void stop(){
         VariableStorage.extendPos = extend.getPos();
         VariableStorage.liftPos = lift.getPos();
     }
 
+
     public void update() {
         transfer();
         pick();
         bucket();
-        specimen();
+        specimenScore();
         chamberScore();
         subPickUp();
         lift.updatePIDF();
@@ -86,6 +105,7 @@ public class Auto {
         intake.prevent2sample();
         intake.autoOuttake();
     }
+
 
     public void transfer() {
         switch (transferState) {
@@ -126,9 +146,13 @@ public class Auto {
         }
     }
 
+
     public void setTransferState(int x) {
         transferState = x;
     }
+
+
+
 
 
 
@@ -137,6 +161,7 @@ public class Auto {
             setTransferState(1);
         }
     }
+
 
     public void bucket() {
         switch (bucketState) {
@@ -190,9 +215,11 @@ public class Auto {
         }
     }
 
+
     public void setBucketState(int x) {
         bucketState = x;
     }
+
 
     public void startBucket() {
         if (actionNotBusy()) {
@@ -201,66 +228,49 @@ public class Auto {
     }
 
 
-    public void specimen() {
-        switch (specimenState) {
+
+
+
+
+
+
+    public void setSpecimenScoreState(int x) {
+        specimenScoreState = x;
+        specimenScoreTimer.resetTimer();
+    }
+
+
+    public void startSpecimenScore() {
+        setSpecimenScoreState(0);
+    }
+
+
+    private void specimenScore() {
+        switch (specimenScoreState) {
+            case 0:
+                outtake.close();
+                telemetry.addLine("started 1");
+                setSpecimenScoreState(1);
+                break;
             case 1:
-                actionBusy = true;
-                lift.toZero();
-                outtake.idle();
-                outtake.open();
-                specimenTimer.resetTimer();
-                setSpecimenState(2);
-                break;
+                if (specimenScoreTimer.getElapsedTimeSeconds() > 0.35) {
+                    lift.toHighChamber();
+                    telemetry.addLine("started 2");
+                    setSpecimenScoreState(2);
+                }
             case 2:
-                if (specimenTimer.getElapsedTimeSeconds() > 0.2 && lift.getPos() < 30) {
-                    outtake.specimenGrab();
-                    specimenTimer.resetTimer();
-                    setSpecimenState(3);
+                if (specimenScoreTimer.getElapsedTimeSeconds() > 0.35) {
+                    outtake.setRotateState(OuttakeSubsystem.RotateState.SPECIMENSCORE);
+                    outtake.setPivotState(OuttakeSubsystem.PivotState.SPECIMENSCORE);
+                    telemetry.addLine("started 3");
+                    setSpecimenScoreState(-1);
                 }
-                break;
-            case 3:
-                if (specimenTimer.getElapsedTimeSeconds() > 0.1) {
-                    outtake.close();
-                    specimenTimer.resetTimer();
-                    setSpecimenState(4);
-                }
-                break;
-            case 4:
-                if (specimenTimer.getElapsedTimeSeconds() > 0.4) {
-                    outtake.specimenScore();
-                    specimenTimer.resetTimer();
-                    setSpecimenState(5);
-                }
-                break;
-            case 5:
-                if (specimenTimer.getElapsedTimeSeconds() > 0.2) {
-                    specimenTimer.resetTimer();
-                    actionBusy = false;
-                    setSpecimenState(-1);
-                }
+
+
                 break;
         }
     }
 
-    public void resetSpecimen() {
-        actionBusy = true;
-        outtake.open();
-        lift.toZero();
-        specimenTimer.resetTimer();
-        setSpecimenState(1);
-        actionBusy = false;
-    }
-
-
-    public void setSpecimenState(int x) {
-        specimenState = x;
-    }
-
-    public void startSpecimen() {
-        if (actionNotBusy()) {
-            setSpecimenState(1);
-        }
-    }
 
     public void chamberScore() {
         switch (chamberScoreState) {
@@ -289,6 +299,7 @@ public class Auto {
         }
     }
 
+
     public void setChamberScoreState(int x) {
         chamberScoreState = x;
     }
@@ -297,6 +308,7 @@ public class Auto {
             setChamberScoreState(1);
         }
     }
+
 
     public void subPickUp() {
         switch (subPickUpState) {
@@ -324,26 +336,19 @@ public class Auto {
                 break;
             case 4:
                 if (subPickUpTimer.getElapsedTimeSeconds() > 0.15) {
-                    intake.swipeClose();
+                    intake.ground();
                     subPickUpTimer.resetTimer();
                     setSubPickUpState(5);
                 }
                 break;
             case 5:
-                if (subPickUpTimer.getElapsedTimeSeconds() > 0.15) {
-                    intake.ground();
+                if (subPickUpTimer.getElapsedTimeSeconds() > 0.2) {
+                    extend.addToTarget(210);
                     subPickUpTimer.resetTimer();
                     setSubPickUpState(6);
                 }
                 break;
             case 6:
-                if (subPickUpTimer.getElapsedTimeSeconds() > 0.2) {
-                    extend.addToTarget(210);
-                    subPickUpTimer.resetTimer();
-                    setSubPickUpState(7);
-                }
-                break;
-            case 7:
                 if (subPickUpTimer.getElapsedTimeSeconds() > 1) {
                     actionBusy = false;
                     intake.idle();
@@ -351,16 +356,17 @@ public class Auto {
                     extend.toZero();
                     intake.transfer();
                     subPickUpTimer.resetTimer();
-                    setSubPickUpState(8);
+                    setSubPickUpState(7);
                 }
                 break;
-            case 8:
+            case 7:
                 if (intakeTimer.getElapsedTimeSeconds() > 0.4 && extend.getPos() < 15) {
                     setSubPickUpState(-1);
                 }
                 break;
         }
     }
+
 
     public void setSubPickUpState(int x) {
         subPickUpState = x;
@@ -372,73 +378,80 @@ public class Auto {
     }
 
 
-/*
-    public void chamberScore() {
-        switch (chamberScoreState) {
-            case 1:
-                actionBusy = true;
-                outtake.specimenScore();
-                extend.toZero();
-                chamberScoreTimer.resetTimer();
-                setChamberScoreState(2);
-                break;
-            case 2:
-                if ((follower.getPose().getX() >= specimen1Pose.getX() - 0.5)) {
-                    chamberScoreTimer.resetTimer();
-                    setChamberScoreState(3);
-                }
-                break;
-            case 3:
-                if(chamberScoreTimer.getElapsedTimeSeconds() > 0.375) {
-                    outtake.open();
-                    actionBusy = false;
-                    setChamberScoreState(-1);
-                }
-                break;
-        }
-    }
 
-    public void setChamberScoreState(int x) {
-        chamberScoreState = x;
-    }
 
-    public void startChamberScore() {
-        if(actionNotBusy()) {
-            setChamberScoreState(1);
-        }
-    }
 
-    public void specimen() {
-        switch (specimenState) {
-            case 1:
-                actionBusy = true;
-                outtake.specimenGrab();
-                extend.toZero();
-                specimenTimer.resetTimer();
-                setSpecimenState(2);
-            case 2:
-                if(specimenTimer.getElapsedTimeSeconds() > 0.25) {
-                    outtake.close();
-                    setSpecimenState(3);
-                }
-                break;
-            case 3:
-                actionBusy = false;
-                setSpecimenState(-1);
-                break;
-        }
-    }
+//   public void chamberScore() {
+//       switch (chamberScoreState) {
+//           case 1:
+//               actionBusy = true;
+//               outtake.specimenScore();
+//               extend.toZero();
+//               chamberScoreTimer.resetTimer();
+//               setChamberScoreState(2);
+//               break;
+//           case 2:
+//               if ((follower.getPose().getX() >= specimen1Pose.getX() - 0.5)) {
+//                   chamberScoreTimer.resetTimer();
+//                   setChamberScoreState(3);
+//               }
+//               break;
+//           case 3:
+//               if(chamberScoreTimer.getElapsedTimeSeconds() > 0.375) {
+//                   outtake.open();
+//                   actionBusy = false;
+//                   setChamberScoreState(-1);
+//               }
+//               break;
+//       }
+//   }
+//
+//
+//   public void setChamberScoreState(int x) {
+//       chamberScoreState = x;
+//   }
+//
+//
+//   public void startChamberScore() {
+//       if(actionNotBusy()) {
+//           setChamberScoreState(1);
+//       }
+//   }
 
-    public void setSpecimenState(int x) {
-        specimenState = x;
-    }
 
-    public void startSpecimen() {
-        if(actionNotBusy()) {
-            setSpecimenState(1);
-        }
-    }
-    */
+   public void specimen() {
+       switch (specimenState) {
+           case 1:
+               actionBusy = true;
+               outtake.specimenGrab();
+               extend.toZero();
+               specimenTimer.resetTimer();
+               setSpecimenState(2);
+           case 2:
+               if(specimenTimer.getElapsedTimeSeconds() > 0.25) {
+                   outtake.close();
+                   setSpecimenState(3);
+               }
+               break;
+           case 3:
+               actionBusy = false;
+               setSpecimenState(-1);
+               break;
+       }
+   }
+
+
+   public void setSpecimenState(int x) {
+       specimenState = x;
+   }
+
+
+   public void startSpecimen() {
+       if(actionNotBusy()) {
+           setSpecimenState(1);
+       }
+   }
+
 
     public void pick() {
         switch (intakeState) {
@@ -447,7 +460,7 @@ public class Auto {
                 setIntakeState(2);
                 break;
             case 2:
-                if(intakeTimer.getElapsedTimeSeconds() > 2.5) {
+                if(intakeTimer.getElapsedTimeSeconds() > 1.6) {
                     intake.intake();
                     intake.ground();
                     intakeTimer.resetTimer();
@@ -486,15 +499,18 @@ public class Auto {
         }
     }
 
+
     public void setIntakeState(int x) {
         intakeState = x;
     }
+
 
     public void startIntake() {
         if (actionNotBusy()) {
             setIntakeState(1);
         }
     }
+
 
     public void park() {
         switch (parkState) {
@@ -517,9 +533,11 @@ public class Auto {
         }
     }
 
+
     public void setParkState(int x) {
         parkState = x;
     }
+
 
     public void startPark() {
         if (actionNotBusy()) {
@@ -527,9 +545,11 @@ public class Auto {
         }
     }
 
+
     public boolean actionNotBusy() {
         return !actionBusy;
     }
+
 
     public void telemetryUpdate() {
         telemetry.addData("Action Busy?: ", actionBusy);
@@ -539,5 +559,6 @@ public class Auto {
         intake.telemetry();
         telemetry.update();
     }
+
 
 }

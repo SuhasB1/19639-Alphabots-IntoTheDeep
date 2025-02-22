@@ -62,7 +62,7 @@ public class Teleop {
 
     public double speed = 1;
 
-    String mode = "intake";
+    String mode = "specimen";
 
     Boolean autoTransfer = false;
     Boolean detected = false;

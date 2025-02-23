@@ -25,12 +25,12 @@ public class BucketAuto extends OpMode {
     private int pathState;
     private final Pose startPose = new Pose(7.75, 112.696, Math.toRadians(270));
 
-    private final Pose score1Pose = new Pose(17.5, 127, Math.toRadians(322));
+    private final Pose score1Pose = new Pose(19.5, 127, Math.toRadians(322));
 
-    private final Pose score2Pose = new Pose(17.5, 127, Math.toRadians(322));
-    private final Pose score3Pose = new Pose(17.5, 127, Math.toRadians(322));
-    private final Pose score4Pose = new Pose(17.5, 127, Math.toRadians(322));
-    private final Pose score5Pose = new Pose(17.5, 127, Math.toRadians(322));
+    private final Pose score2Pose = new Pose(19.5, 127, Math.toRadians(322));
+    private final Pose score3Pose = new Pose(19.5, 125, Math.toRadians(322));
+    private final Pose score4Pose = new Pose(19.5, 125, Math.toRadians(322));
+    private final Pose score5Pose = new Pose(19.5, 125, Math.toRadians(322));
 
 
     private final Pose pickup1Pose = new Pose(25.5, 120.2, Math.toRadians(0));
@@ -40,7 +40,8 @@ public class BucketAuto extends OpMode {
     private final Pose pickup3Pose = new Pose(32.5, 126, Math.toRadians(35));
 
     private final Pose pickup4Pose = new Pose(68, 95, Math.toRadians(270));
-    private final Pose pickup4ControlPose = new Pose(57, 135);
+    private final Pose pickup4Control1Pose = new Pose(18.58670143415906, 94.62320730117341);
+    private final Pose pickup4Control2Pose = new Pose(77.16297262059975, 133.86179921773143);
 
     private final Pose parkPose = new Pose(63, 95, Math.toRadians(90));
 
@@ -84,12 +85,12 @@ public class BucketAuto extends OpMode {
                 .build();
 
         grabPickup4 = follower.pathBuilder()
-                .addPath(new BezierCurve(new Point(score4Pose), new Point(pickup4ControlPose), new Point(pickup4Pose)))
+                .addPath(new BezierCurve(new Point(score4Pose), new Point(pickup4Control1Pose), new Point(pickup4Control2Pose), new Point(pickup4Pose)))
                 .setLinearHeadingInterpolation(score4Pose.getHeading(), pickup4Pose.getHeading())
                 .build();
 
         scorePickup4 = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(pickup4Pose), new Point(score5Pose)))
+                .addPath(new BezierCurve(new Point(pickup4Pose), new Point(pickup4Control2Pose), new Point(pickup4Control1Pose), new Point(score5Pose)))
                 .setLinearHeadingInterpolation(pickup4Pose.getHeading(), score5Pose.getHeading())
                 .build();
 
@@ -117,7 +118,7 @@ public class BucketAuto extends OpMode {
                 }
                 break;
             case 3:
-                if(follower.getCurrentTValue() > 0.99 && auto.actionNotBusy()) {
+                if(follower.getCurrentTValue() > 0.99 && auto.actionNotBusy() && pathTimer.getElapsedTimeSeconds() > 1) {
                     auto.startIntake();
                     setPathState(4);
                 }
@@ -147,7 +148,7 @@ public class BucketAuto extends OpMode {
                 }
                 break;
             case 8:
-                if(follower.getCurrentTValue() > 0.99 && auto.actionNotBusy()) {
+                if(follower.getCurrentTValue() > 0.99 && auto.actionNotBusy() && pathTimer.getElapsedTimeSeconds() > 1.5) {
                     auto.startIntake();
                     setPathState(9);
                 }
@@ -177,7 +178,7 @@ public class BucketAuto extends OpMode {
                 }
                 break;
             case 13:
-                if(follower.getCurrentTValue() > 0.99 && auto.actionNotBusy()) {
+                if(follower.getCurrentTValue() > 0.99 && auto.actionNotBusy() && pathTimer.getElapsedTimeSeconds() > 1) {
                     auto.startIntake();
                     setPathState(14);
                 }
@@ -217,6 +218,7 @@ public class BucketAuto extends OpMode {
             case 19:
                 if(follower.getCurrentTValue() > 0.99 && auto.actionNotBusy()) {
                     auto.startSubPickUp();
+
                     setPathState(20);
                 }
                 break;
@@ -278,6 +280,8 @@ public class BucketAuto extends OpMode {
         follower = new Follower(hardwareMap);
         follower.setStartingPose(startPose);
         auto = new Auto(hardwareMap, telemetry);
+        auto.outtake.init();
+        auto.intake.start();
         buildPaths();
     }
 

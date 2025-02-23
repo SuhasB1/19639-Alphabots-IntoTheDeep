@@ -75,8 +75,6 @@ public class Auto {
 
     public void init() {
         telemetryUpdate();
-        outtake.init();
-        intake.start();
     }
 
 
@@ -103,7 +101,6 @@ public class Auto {
         lift.updatePIDF();
         extend.updatePIDF();
         telemetryUpdate();
-        intake.prevent2sample();
         intake.autoOuttake();
     }
 
@@ -173,16 +170,18 @@ public class Auto {
     private void specimenGrab() {
         switch (specimenGrabState) {
             case 0:
+                actionBusy = true;
                 outtake.open();
                 telemetry.addLine("started 1");
                 setSpecimenGrabState(1);
                 break;
             case 1:
                 if (specimenGrabTimer.getElapsedTimeSeconds() > 0.35) {
+                    actionBusy = false;
                     lift.toZero();
                     outtake.setRotateState(OuttakeSubsystem.RotateState.SPECIMENGRAB);
-                    outtake.leftPivot.setPosition(RobotConstants.outtakePivotSpecimenGrab + 3);
-                    outtake.rightPivot.setPosition(RobotConstants.outtakePivotSpecimenGrab + 3);
+                    outtake.leftPivot.setPosition(RobotConstants.outtakePivotSpecimenGrab - 3);
+                    outtake.rightPivot.setPosition(RobotConstants.outtakePivotSpecimenGrab - 3);
                     telemetry.addLine("started 2");
                     setSpecimenGrabState(2);
                 }
@@ -211,8 +210,8 @@ public class Auto {
                 break;
             case 2:
                 if (lift.getPos() > RobotConstants.liftToHighBucket - 300) {
-                    intake.intake();
-                    extend.setTarget(200);
+                    intake.outtake();
+                    extend.setTarget(150);
                     intake.ground();
                     outtake.score();
                     outtake.close();
@@ -228,6 +227,7 @@ public class Auto {
             case 4:
                 if (bucketTimer.getElapsedTimeSeconds() > 0.2) {
                     outtake.open();
+                    intake.intake();
                     bucketTimer.resetTimer();
                     actionBusy = false;
                     setBucketState(5);
@@ -284,6 +284,7 @@ public class Auto {
     private void specimenScore() {
         switch (specimenScoreState) {
             case 0:
+                actionBusy = true;
                 outtake.close();
                 telemetry.addLine("started 1");
                 setSpecimenScoreState(1);
@@ -295,14 +296,18 @@ public class Auto {
                     setSpecimenScoreState(2);
                 }
             case 2:
-                if (specimenScoreTimer.getElapsedTimeSeconds() > 0.35) {
+                if (lift.getPos() > RobotConstants.liftToHighChamber - 500) {
                     outtake.setRotateState(OuttakeSubsystem.RotateState.SPECIMENSCORE);
                     outtake.setPivotState(OuttakeSubsystem.PivotState.SPECIMENSCORE);
                     telemetry.addLine("started 3");
+                    setSpecimenScoreState(3);
+                }
+                break;
+            case 3:
+                if (specimenScoreTimer.getElapsedTimeSeconds() > 0.3) {
+                    actionBusy = false;
                     setSpecimenScoreState(-1);
                 }
-
-
                 break;
         }
     }
@@ -350,9 +355,8 @@ public class Auto {
         switch (subPickUpState) {
             case 1:
                 actionBusy = true;
-                extend.setTarget(80);
+                extend.setTarget(60);
                 intake.swipeOpen();
-                intake.intake();
                 subPickUpTimer.resetTimer();
                 setSubPickUpState(2);
                 break;
@@ -373,13 +377,14 @@ public class Auto {
             case 4:
                 if (subPickUpTimer.getElapsedTimeSeconds() > 0.15) {
                     intake.ground();
+                    intake.intake();
                     subPickUpTimer.resetTimer();
                     setSubPickUpState(5);
                 }
                 break;
             case 5:
                 if (subPickUpTimer.getElapsedTimeSeconds() > 0.2) {
-                    extend.addToTarget(210);
+                    extend.setTarget(415);
                     subPickUpTimer.resetTimer();
                     setSubPickUpState(6);
                 }
@@ -496,11 +501,11 @@ public class Auto {
                 setIntakeState(2);
                 break;
             case 2:
-                if(intakeTimer.getElapsedTimeSeconds() > 3.2) {
+                if(intakeTimer.getElapsedTimeSeconds() > 0.1) {
                     intake.intake();
                     intake.ground();
                     intakeTimer.resetTimer();
-                    extend.setTarget(400);
+                    extend.setTarget(420);
                     intakeTimer.resetTimer();
                     setIntakeState(3);
                 }
